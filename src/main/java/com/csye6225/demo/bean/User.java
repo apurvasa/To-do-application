@@ -1,7 +1,5 @@
 package com.csye6225.demo.bean;
 
-
-
 import javax.persistence.*;
 
 @Entity
@@ -11,9 +9,10 @@ public class User {
 
     public User(){}
 
-    public User(int userId, String userName, String email, String password){
+    public User(int userId,String userName, String email,String password){
 
         this.userId = userId;
+        this.email=email;
         this.userName=userName;
         this.password=password;
 
