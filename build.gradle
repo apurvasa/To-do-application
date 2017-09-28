@@ -24,6 +24,14 @@ repositories {
     mavenCentral()
 }
 
+sourceSets {
+    test {
+        java {
+            srcDir 'junit/basicTest'
+        }
+    }
+}
+
 configurations {
     providedRuntime
 }
