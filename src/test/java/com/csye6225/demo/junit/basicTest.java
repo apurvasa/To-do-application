@@ -1,4 +1,4 @@
-package junit;
+package com.csye6225.demo.junit;
 
 import org.junit.Test;
 

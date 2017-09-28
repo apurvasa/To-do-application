@@ -2,12 +2,13 @@ package com.csye6225.demo.rest_assured;
 
 import io.restassured.RestAssured;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 
 public class controllerTest {
 
 
 
-
+@Ignore
         @BeforeClass
         public static void setup() {
             String port = System.getProperty("server.port");
