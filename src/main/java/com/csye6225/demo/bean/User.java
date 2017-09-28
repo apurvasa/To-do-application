@@ -1,5 +1,8 @@
 package com.csye6225.demo.bean;
 
+import com.google.gson.Gson;
+import org.json.simple.JSONObject;
+
 import javax.persistence.*;
 
 @Entity
@@ -63,5 +66,10 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString();
     }
 }

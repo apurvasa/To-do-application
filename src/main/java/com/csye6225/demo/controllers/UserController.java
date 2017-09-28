@@ -3,39 +3,37 @@ package com.csye6225.demo.controllers;
 import com.csye6225.demo.bean.User;
 import com.csye6225.demo.dao.UserDao;
 import com.google.gson.*;
-import jdk.nashorn.internal.parser.JSONParser;
-import org.apache.coyote.Constants;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.tomcat.util.http.parser.Authorization;
+import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+
 import java.util.Iterator;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+
 
 
 @RestController
-public class UserController extends HttpServlet{
+public class UserController{
 
     @Autowired
     private UserDao userDao;
 
 
+
     @RequestMapping(value = "/user/register", method = RequestMethod.POST)
-    public String register(@RequestBody String jo) {
+    public Object register(@RequestBody JSONObject jo) throws IOException {
 
-        System.out.println(jo.toString());
+        String userName = (String)jo.get("UserName");
+        String email = (String)jo.get("EmailId");
+        String password = (String)jo.get("Password");
 
 
-        JsonParser parser = new JsonParser();
-        JsonObject jsonObject = (JsonObject)parser.parse(jo);
+        System.out.println(userName);
+        System.out.println(email);
+        System.out.println(password);
 
-        String userName = jsonObject.get("UserName").toString();
-        String email = jsonObject.get("EmailId").toString();
-        String password = jsonObject.get("Password").toString();
 
         Iterable<User> users = userDao.findAll();
         Iterator itr = users.iterator();
@@ -67,7 +65,7 @@ public class UserController extends HttpServlet{
         JsonObject j = new JsonObject();
         j.addProperty("Message","User " + userName + " is registered successfully!!");
 
-        return j.toString();
+        return jo;
 
 
 
