@@ -27,7 +27,7 @@ public class RestApiTest  {
     public void makeSureThatGoogleIsUp() {
         RestAssured.when().get("http://www.google.com").then().statusCode(200);
     }*/
-
+/*@Ignore
    @Test
     public void aCarGoesIntoTheGarage() {
 
@@ -37,6 +37,6 @@ public class RestApiTest  {
                 .body("{\"UserName\":\"Jimi\"\"EmailId\":\"Jimi@gmail.com\"\"Password\":\"Jimi34\"}")
                 .when().post("/user/register").then()
                 .statusCode(200);
-    }
+    }*/
 
 }
