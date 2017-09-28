@@ -24,7 +24,7 @@ repositories {
     mavenCentral()
 }
 
-sourceSets {
+src {
     test {
         java {
             srcDir 'junit/basicTest'
