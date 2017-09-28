@@ -23,6 +23,7 @@ Last step is to select the Tomcat 8 and hit on run.
 
 Instructions to run unit, integration and/or load tests.
 
-Inside the src folder go in the test folder then go in the JUint. Inside JUnit go on basic test then right click and run.
+Inside the src folder go in the test folder then go in the JUint. 
+Inside JUnit go on basic test then right click and run.
 
 Link to TravisCI build for the project.
