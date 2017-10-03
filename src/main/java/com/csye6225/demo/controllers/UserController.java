@@ -3,73 +3,87 @@ package com.csye6225.demo.controllers;
 import com.csye6225.demo.bean.User;
 import com.csye6225.demo.dao.UserDao;
 import com.google.gson.*;
+import jdk.nashorn.internal.parser.JSONParser;
+import org.apache.coyote.Constants;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.tomcat.util.http.parser.Authorization;
+
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.web.bind.annotation.*;
 
+
 import java.io.IOException;
 
 import java.util.Iterator;
-
+import java.util.Iterator;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 
 @RestController
 public class UserController{
+
 
     @Autowired
     private UserDao userDao;
 
 
 
+
+
     @RequestMapping(value = "/user/register", method = RequestMethod.POST)
-    public Object register(@RequestBody JSONObject jo) throws IOException {
-
-        String userName = (String)jo.get("UserName");
-        String email = (String)jo.get("EmailId");
-        String password = (String)jo.get("Password");
+    public Object register(@RequestBody JSONObject jo) {
+      //  public String register (@RequestBody String jo){
+            System.out.println(jo.toString());
 
 
-        System.out.println(userName);
-        System.out.println(email);
-        System.out.println(password);
+            String userName = jo.get("UserName").toString();
+            String email = jo.get("EmailId").toString();
+            String password = jo.get("Password").toString();
+
+            Iterable<User> users = userDao.findAll();
+            Iterator itr = users.iterator();
+
+            while (itr.hasNext()) {
 
 
-        Iterable<User> users = userDao.findAll();
-        Iterator itr = users.iterator();
+                    User user = (User) itr.next();
 
-        do {
+                    if (user.getEmail().equalsIgnoreCase(email)) {
 
-            User user = (User) itr.next();
+                        return "User already exist!!!";
+                    }
 
-            if (user.getEmail().equalsIgnoreCase(email)) {
 
-                return "User already exist!!!";
+
             }
 
+            String pw_hash = BCrypt.hashpw(password, BCrypt.gensalt(12));
+            System.out.println(pw_hash);
 
-        } while (itr.hasNext());
+            User u = new User();
+            u.setUserName(userName);
+            u.setEmail(email);
+            u.setPassword(pw_hash);
 
-        String pw_hash = BCrypt.hashpw(password, BCrypt.gensalt(12));
-        System.out.println(pw_hash);
+            userDao.save(u);
 
-        User u = new User();
-        u.setUserName(userName);
-        u.setEmail(email);
-        u.setPassword(pw_hash);
+            System.out.println("User " + userName + " is registered successfully!!");
 
-        userDao.save(u);
+            JsonObject j = new JsonObject();
+            j.addProperty("Message", "User " +userName+ " is registered successfully!!");
 
-        System.out.println("User " + userName + " is registered successfully!!");
-
-        JsonObject j = new JsonObject();
-        j.addProperty("Message","User " + userName + " is registered successfully!!");
-
-        return jo;
+            return jo;
 
 
 
-    }
+
+
+        }
+
 
 
   /*  @RequestMapping(value = "/user/login/{email}/{password}", method = RequestMethod.POST)
@@ -121,4 +135,8 @@ public class UserController{
 */
 
 
+
 }
+
+
+

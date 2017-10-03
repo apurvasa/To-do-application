@@ -31,6 +31,7 @@
           <element id="library" level="project" name="Gradle: org.hibernate:hibernate-core:5.2.11.Final" />
           <element id="library" level="project" name="Gradle: org.hibernate:hibernate-entitymanager:5.2.11.Final" />
           <element id="library" level="project" name="Gradle: com.googlecode.json-simple:json-simple:1.1.1" />
+          <element id="library" level="project" name="Gradle: io.rest-assured:json-path:3.0.3" />
           <element id="library" level="project" name="Gradle: org.springframework.boot:spring-boot-starter:1.5.6.RELEASE" />
           <element id="library" level="project" name="Gradle: org.springframework.boot:spring-boot-actuator:1.5.6.RELEASE" />
           <element id="library" level="project" name="Gradle: org.springframework.hateoas:spring-hateoas:0.23.0.RELEASE" />
@@ -69,6 +70,9 @@
           <element id="library" level="project" name="Gradle: org.hibernate.common:hibernate-commons-annotations:5.0.1.Final" />
           <element id="library" level="project" name="Gradle: net.bytebuddy:byte-buddy:1.6.14" />
           <element id="library" level="project" name="Gradle: junit:junit:4.12" />
+          <element id="library" level="project" name="Gradle: org.codehaus.groovy:groovy-json:2.4.12" />
+          <element id="library" level="project" name="Gradle: org.codehaus.groovy:groovy:2.4.12" />
+          <element id="library" level="project" name="Gradle: io.rest-assured:rest-assured-common:3.0.3" />
           <element id="library" level="project" name="Gradle: org.springframework.boot:spring-boot:1.5.6.RELEASE" />
           <element id="library" level="project" name="Gradle: org.springframework.boot:spring-boot-autoconfigure:1.5.6.RELEASE" />
           <element id="library" level="project" name="Gradle: org.springframework.boot:spring-boot-starter-logging:1.5.6.RELEASE" />
