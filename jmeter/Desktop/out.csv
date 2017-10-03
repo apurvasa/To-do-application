@@ -1,0 +1,7 @@
+timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,bytes,sentBytes,grpThreads,allThreads,Latency,IdleTime,Connect
+1506631863503,5198,register,200,,thread 1-1,text,true,,234,261,1,1,5198,0,80
+1506631868720,225,login,200,,thread 1-1,text,true,,228,217,1,1,225,0,87
+1506631938302,1338,register,200,,thread 1-1,text,true,,234,261,1,1,1333,0,9
+1506631939644,164,login,200,,thread 1-1,text,true,,226,213,1,1,164,0,0
+1506632013561,1165,register,200,,thread 1-1,text,true,,234,261,1,1,1160,0,1
+1506632014729,61,login,200,,thread 1-1,text,true,,228,221,1,1,61,0,0
