@@ -3,13 +3,16 @@ Team member information such as Name and Email address.
 Riddhi Chabhadia chabhadia.r@husky.neu.edu
 Apurva Sawant sawant.ap@husky.neu.edu
 Shubham Patel patel.shu@husky.neu.edu
+
 Prerequisites for building and deploying your application locally.
 
-1.Install Oracle Virtual Box locally and create a Ubuntu 16.04 LTS virtual machine. 
-2.Install Java 8. IntelliJ IDE Ultimate version should be installed.
-3.Git should be installed. 
-4.Tomcat must be installed and configured to IntelliJ IDE Gradle depencies should be downloaded.
-5.Install MySQL Create your Github and TravisCI to buid the application.
+1.Install Oracle Virtual Box locally and create a Ubuntu 16.04 LTS virtual machine.
+2.Install Java 8. 
+3.IntelliJ IDE Ultimate version should be installed.
+4.Git should be installed.
+5.Tomcat must be installed and configured to IntelliJ IDE Gradle depencies should be downloaded. 
+6.Istall MySQL Create your Github and TravisCI to buid the application.
+
 
 Build and Deploy instructions for web application.
 
