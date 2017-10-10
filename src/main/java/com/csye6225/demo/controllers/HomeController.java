@@ -3,6 +3,15 @@ package com.csye6225.demo.controllers;
 
 import com.csye6225.demo.bean.User;
 import com.csye6225.demo.dao.UserDao;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.stereotype.Controller;
+
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -21,14 +30,20 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestHeader;
+
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import com.google.gson.*;
+
+import javax.servlet.http.HttpServletRequest;
+
 
 import com.google.gson.JsonObject;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.nio.charset.Charset;
 import java.util.Base64;
 import java.util.Date;
