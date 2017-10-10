@@ -1,33 +1,41 @@
 package com.csye6225.demo.controllers;
 
+import com.csye6225.demo.bean.TodoTask;
 import com.csye6225.demo.bean.User;
+import com.csye6225.demo.dao.TaskDao;
 import com.csye6225.demo.dao.UserDao;
+import com.csye6225.demo.services.GenerateUUID;
 import com.google.gson.*;
-import jdk.nashorn.internal.parser.JSONParser;
-import org.apache.coyote.Constants;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.tomcat.util.http.parser.Authorization;
+import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Iterator;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Iterator;
+
 
 
 @RestController
-public class UserController extends HttpServlet {
+public class UserController{
+
 
     @Autowired
     private UserDao userDao;
 
+    @Autowired
+    private GenerateUUID generateUUID;
+
+    @Autowired
+    private TaskDao taskDao;
+
+
+
 
     @RequestMapping(value = "/user/register", method = RequestMethod.POST)
     public Object register(@RequestBody JSONObject jo) {
-      //  public String register (@RequestBody String jo){
+
             System.out.println(jo.toString());
 
 
@@ -75,54 +83,65 @@ public class UserController extends HttpServlet {
 
         }
 
-
-  /*  @RequestMapping(value = "/user/login/{email}/{password}", method = RequestMethod.POST)
-    public Object login(@PathVariable String email, @PathVariable String password){
-
+    @RequestMapping(value = "/tasks" ,method = RequestMethod.POST)
+    public String createTask(@RequestBody JSONObject jsonObject,HttpServletRequest request, HttpServletResponse response) {
 
 
-        Iterable<User> lu = userDao.findAll();
+        String description = jsonObject.get("Description").toString();
 
-        Iterator itr = lu.iterator();
-        do{
+        int descriptionLength = description.length();
 
-          User u1 = (User)itr.next();
-
-            if(u1.getEmail().equalsIgnoreCase(email)){
-
-                if(BCrypt.checkpw(password, u1.getPassword())){
-
-                    Gson gs = new Gson();
-                    String jsonString = gs.toJson(u1);
-                    JsonParser parser = new JsonParser();
-                    JsonObject json = (JsonObject) parser.parse(jsonString);
-
-                    JsonObject jo = new JsonObject();
-                    jo.addProperty("Login ", "Welcome "+u1.getUserName()+" you are logeed in");
+        if (descriptionLength < 4097) {
 
 
-                    JsonArray array = new JsonArray();
-                    array.add(jo);
-                    array.add(json);
+            String id = generateUUID.getUUID();
 
-                    System.out.println(array.toString());
+            TodoTask tt = new TodoTask(id, description);
 
-                    return array;
+            taskDao.save(tt);
+
+            response.setStatus(201);
 
 
-                }else{
+            return "Task Added Succsesfully" + "Your To Do Task Id is : " +id;
+        }else{
 
-                    return "Password Doesn't Match";
-                }
-            }
+            response.setStatus(400);
 
+            return "Description Should have less than 4096 Characters ";
         }
-        while(itr.hasNext());
-
-
-        return "User With Given Email "+email+" Doest Exist!!!";
     }
-*/
+
+    @RequestMapping(value = "/tasks/{id}" ,method = RequestMethod.PUT)
+    public String updateTask(@RequestBody JSONObject jsonObject, @PathVariable String id, HttpServletRequest request, HttpServletResponse response) {
+
+
+        String taskId = id;
+
+        String description = jsonObject.get("Description").toString();
+
+
+
+        boolean exist = taskDao.exists(new Long(taskId).longValue());
+
+        if(exist == true){
+
+            TodoTask tt = new TodoTask(taskId,description);
+            taskDao.save(tt);
+
+            response.setStatus(200);
+
+            return "Update to the Task Id: " +taskId+ " has been done";
+        }else{
+
+            response.setStatus(400);
+
+            return "Given Task Id doesn't exists";
+        }
+    }
 
 
     }
+
+
+

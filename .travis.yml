@@ -9,7 +9,13 @@ script:
   - ./gradlew war
   - ./gradlew test
 
+
 notifications:
   email:
     recipients:
-      - chabhadia.r@husky.neu.edu
+
+    - patel.shu@husky.neu.edu
+    - sawant.ap@husky.neu.edu
+    - chabhadia.r@husky.neu.edu
+
+
