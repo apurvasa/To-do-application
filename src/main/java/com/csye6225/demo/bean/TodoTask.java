@@ -20,6 +20,18 @@ public class TodoTask {
     @Column(name="description")
     private String description;
 
+    @ManyToOne
+    @JoinColumn(name="userID",nullable = false)
+    private User users;
+
+    public User getUsers() {
+        return users;
+    }
+
+    public void setUsers(User users) {
+        this.users = users;
+    }
+
     public String getId() {
         return id;
     }
