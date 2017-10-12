@@ -20,6 +20,18 @@ public class TodoTask {
     @Column(name="description")
     private String description;
 
+    @Column(name="taskAttachments")
+    private String taskAttachments;
+
+
+    public String getTaskAttachments() {
+        return taskAttachments;
+    }
+
+    public void setTaskAttachments(String taskAttachments) {
+        this.taskAttachments = taskAttachments;
+    }
+
     public String getId() {
         return id;
     }
