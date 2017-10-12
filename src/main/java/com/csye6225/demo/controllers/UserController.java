@@ -22,7 +22,11 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.charset.Charset;
+import java.util.Base64;
+import java.util.Date;
 import java.util.Iterator;
+
 
 
 
@@ -87,36 +91,93 @@ public class UserController {
     }
 
     @RequestMapping(value = "/tasks", method = RequestMethod.POST)
-    public String createTask(@RequestBody JSONObject jsonObject, HttpServletRequest request, HttpServletResponse response) {
+    public Object createTask(@RequestBody JSONObject jsonObject, HttpServletRequest request, HttpServletResponse response) {
+
+        final String authorization = request.getHeader("Authorization");
+        if (authorization != null && authorization.startsWith("Basic")) {
+
+            String base64Credentials = authorization.substring("Basic".length()).trim();
+            String credentials = new String(Base64.getDecoder().decode(base64Credentials),
+                    Charset.forName("UTF-8"));
+
+            final String[] values = credentials.split(":", 2);
+
+            String email = values[0];
+            String password = values[1];
+
+            System.out.println(email);
+            System.out.println(password);
+
+            Iterable<User> lu = userDao.findAll();
+
+            Iterator itr = lu.iterator();
+            do {
+
+                User u1 = (User) itr.next();
+
+                if (u1.getEmail().equalsIgnoreCase(email)) {
+
+                    if (BCrypt.checkpw(password, u1.getPassword())) {
+
+                        String description = jsonObject.get("Description").toString();
+
+                        int descriptionLength = description.length();
+
+                        if (descriptionLength < 4097) {
 
 
-        String description = jsonObject.get("Description").toString();
+                            String id = generateUUID.getUUID();
 
-        int descriptionLength = description.length();
+                            TodoTask tt = new TodoTask(id, description);
 
-        if (descriptionLength < 4097) {
+                            u1.getTodoTasks().add(tt);
 
+                            tt.setUsers(u1);
 
-            String id = generateUUID.getUUID();
+                            taskDao.save(tt);
 
-            TodoTask tt = new TodoTask(id, description);
-
-            taskDao.save(tt);
-
-            response.setStatus(201);
+                            response.setStatus(201);
 
 
-            return "Task Added Succsesfully" + "Your To Do Task Id is : " + id;
+                            return "Task Added " + " Your To Do Task Id is : " + id;
+                        } else {
+
+                            response.setStatus(400);
+
+                            return "Description Should have less than 4096 Characters ";
+                        }
+
+
+                    } else {
+
+                        JsonObject j = new JsonObject();
+                        j.addProperty("Error", "Password Doesn't Match");
+                        return j.toString();
+                    }
+                }
+
+            }
+            while (itr.hasNext());
+
+            JsonObject j = new JsonObject();
+            j.addProperty("Error", "User With Given Email " + email + " Doest Exist!!!");
+
+            return j.toString();
+
         } else {
 
-            response.setStatus(400);
+            JsonObject j = new JsonObject();
+            j.addProperty("Error", "Unauthorized User: You Are Not Logged In");
 
-            return "Description Should have less than 4096 Characters ";
         }
+
+
+
+        return null;
     }
 
     @RequestMapping(value = "/tasks/{id}", method = RequestMethod.PUT)
-    public String updateTask(@RequestBody JSONObject jsonObject, @PathVariable(value = "id") String id, HttpServletRequest request, HttpServletResponse response) {
+    public String updateTask(@RequestBody JSONObject jsonObject, @PathVariable String id, HttpServletRequest request, HttpServletResponse response) {
 
 
         String taskId = id;
@@ -133,7 +194,17 @@ public class UserController {
 
             if (todo.getId().equalsIgnoreCase(taskId)) {
 
+                Long userId = todo.getUsers().getUserId();
+
+                System.out.println(userId);
+
+                User user1 = userDao.findOne(userId);
+
                 TodoTask tt = new TodoTask(taskId, description);
+
+                user1.getTodoTasks().add(tt);
+
+                tt.setUsers(user1);
 
                 taskDao.save(tt);
 
@@ -149,6 +220,41 @@ public class UserController {
         return "Given Task Id doesn't exists";
 
     }
+
+    @RequestMapping(value = "/tasks/{id}", method = RequestMethod.DELETE)
+    public String deleteTask(@PathVariable String id, HttpServletRequest request, HttpServletResponse response) {
+
+
+        String taskId = id;
+
+        Iterable<TodoTask> tasks = taskDao.findAll();
+
+        Iterator itr = tasks.iterator();
+
+        while (itr.hasNext()) {
+
+            TodoTask todoTask = (TodoTask) itr.next();
+
+            if (todoTask.getId().equalsIgnoreCase(taskId)) {
+
+                taskDao.delete(todoTask);
+
+                response.setStatus(204);
+
+                return "Task Id: " + taskId + " has been deleted";
+
+            }
+        }
+
+
+
+        response.setStatus(400);
+
+        return "Given Task Id doesn't exists";
+
+    }
+
+
 
 
     @RequestMapping(value = "/tasks/{id}/attachments", method = RequestMethod.POST, produces = "application/json", consumes = "multipart/form-data")
@@ -195,7 +301,6 @@ public class UserController {
 
 
     }
-
 
 
 }

@@ -3,6 +3,10 @@ package com.csye6225.demo.bean;
 
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name="userTable")
@@ -11,7 +15,8 @@ public class User {
 
     public User(){}
 
-    public User(int userId,String userName, String email,String password,String attachment){
+    public User(Long userId,String userName, String email,String password){
+
 
         this.userId = userId;
         this.email=email;
@@ -23,7 +28,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "userID", unique = true)
-     private int userId;
+     private Long userId;
 
     @Column(name="userName")
     private String userName;
@@ -34,12 +39,14 @@ public class User {
     @Column(name = "password")
     private String password;
 
+    @OneToMany(mappedBy = "users")
+    private List<TodoTask> todoTasks = new ArrayList<TodoTask>();
 
-    public int getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 
@@ -67,6 +74,13 @@ public class User {
         this.password = password;
     }
 
+    public List<TodoTask> getTodoTasks() {
+        return todoTasks;
+    }
+
+    public void setTodoTasks(List<TodoTask> todoTasks) {
+        this.todoTasks = todoTasks;
+    }
 
     @Override
     public String toString() {

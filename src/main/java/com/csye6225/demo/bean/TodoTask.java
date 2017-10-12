@@ -20,9 +20,15 @@ public class TodoTask {
     @Column(name="description")
     private String description;
 
+
     @Column(name="taskAttachments")
     private String taskAttachments;
 
+
+
+    @ManyToOne
+    @JoinColumn(name="userID",nullable = false)
+    private User users;
 
     public String getTaskAttachments() {
         return taskAttachments;
@@ -30,6 +36,16 @@ public class TodoTask {
 
     public void setTaskAttachments(String taskAttachments) {
         this.taskAttachments = taskAttachments;
+
+    }
+
+    public User getUsers() {
+        return users;
+    }
+
+    public void setUsers(User users) {
+        this.users = users;
+
     }
 
     public String getId() {
