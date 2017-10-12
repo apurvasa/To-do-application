@@ -283,7 +283,7 @@ public class UserController {
 
                 String idd = generateUUID.getUUID();
                 TodoTask tt = new TodoTask(idd, "description");
-                tt.setTaskAttachments(path.toString());
+                //tt.setTaskAttachments(path.toString());
                 taskDao.save(tt);
                 System.out.println("You successfully uploaded file=" + name);
                 response.setStatus(200);
