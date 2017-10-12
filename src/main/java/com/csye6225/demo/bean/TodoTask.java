@@ -32,7 +32,7 @@ public class TodoTask {
     private User users;
 
 
-    @OneToMany(mappedBy = "taskAttachments")
+    @OneToMany(mappedBy = "todoTask")
     private List<TaskAttachments> taskAttachments = new ArrayList<TaskAttachments>();
 
 

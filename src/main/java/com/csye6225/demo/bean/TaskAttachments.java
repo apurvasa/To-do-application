@@ -18,6 +18,10 @@ public class TaskAttachments {
     }
 
 
+    @Id
+    @Column(name="attachmentId")
+    private String id;
+
     @Column(name="path")
     private String path;
 
@@ -42,5 +46,13 @@ public class TaskAttachments {
 
     public void setTodoTask(TodoTask todoTask) {
         this.todoTask = todoTask;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }
