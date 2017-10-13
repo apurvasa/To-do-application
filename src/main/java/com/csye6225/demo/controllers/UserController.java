@@ -1,7 +1,9 @@
 package com.csye6225.demo.controllers;
 
+import com.csye6225.demo.bean.TaskAttachments;
 import com.csye6225.demo.bean.TodoTask;
 import com.csye6225.demo.bean.User;
+import com.csye6225.demo.dao.AttachmentsDao;
 import com.csye6225.demo.dao.TaskDao;
 import com.csye6225.demo.dao.UserDao;
 import com.csye6225.demo.services.GenerateUUID;
@@ -23,11 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.charset.Charset;
-import java.util.Base64;
-import java.util.Date;
-import java.util.Iterator;
-
-
+import java.util.*;
 
 
 @RestController
@@ -43,6 +41,9 @@ public class UserController {
     @Autowired
     private TaskDao taskDao;
 
+
+    @Autowired
+    private AttachmentsDao attachmentsDao;
 
     @RequestMapping(value = "/user/register", method = RequestMethod.POST)
     public Object register(@RequestBody JSONObject jo) {
@@ -267,27 +268,44 @@ public class UserController {
             System.out.println("inside if ");
 
             try {
-                //String rootPath = request.getServletContext().getRealPath("/");
-                String fileName = file.getOriginalFilename();
+                String taskId = id;
 
-//                System.out.println("orig path"+fileName);
-//                File destinationfile= new File(rootPath+File.separator+fileName);
+                Iterable<TodoTask> tasks = taskDao.findAll();
+
+                Iterator itr = tasks.iterator();
+
+                while (itr.hasNext()) {
+
+                    TodoTask todoTask = (TodoTask) itr.next();
+
+                    if (todoTask.getId().equalsIgnoreCase(taskId)) {
+                        String fileName = file.getOriginalFilename();
 
 
-                byte[] bytes = file.getBytes();
-                Path path = Paths.get("//home//riddhi//Desktop//tmpFiles//"+fileName);
-                Files.write(path, bytes);
+                        byte[] bytes = file.getBytes();
+                        Path path = Paths.get("//home//riddhi//Desktop//tmpFiles//"+fileName);
+                        Files.write(path, bytes);
+                        TaskAttachments ta=new TaskAttachments();
+                        ta.setPath(path.toString());
+                        ta.setId(generateUUID.getUUID());
+                        ta.setTodoTask(todoTask);
+                        List<TaskAttachments> tal=new ArrayList<TaskAttachments>();
+                        tal.add(ta);
+                        todoTask.setTaskAttachments(tal);
+                        attachmentsDao.save(ta);
 
 
+                        System.out.println("You successfully uploaded file=" + name);
+                        response.setStatus(200);
+                        return "Saved";
 
 
-                String idd = generateUUID.getUUID();
-                TodoTask tt = new TodoTask(idd, "description");
-                //tt.setTaskAttachments(path.toString());
-                taskDao.save(tt);
-                System.out.println("You successfully uploaded file=" + name);
-                response.setStatus(200);
-                return "Saved";
+                    }
+                    else
+                        return "ID does not exists";
+                }
+
+
             } catch (Exception e) {
                 System.out.println(e.getMessage());
                 response.setStatus(400);
@@ -298,9 +316,89 @@ public class UserController {
             return "File Empty";
         }
 
+return null;
+    }
 
+
+
+
+
+
+
+    @RequestMapping(value = "/tasks/{id}/attachments/{idAttachments}", method = RequestMethod.DELETE)
+    public String deleteAttachment(@PathVariable("idAttachments") String idAttachments, HttpServletRequest request, HttpServletResponse response) {
+
+
+        String taskId = idAttachments;
+
+        Iterable<TaskAttachments> attachments = attachmentsDao.findAll();
+
+        Iterator itr = attachments.iterator();
+
+        while (itr.hasNext()) {
+
+            TaskAttachments taskAttachments = (TaskAttachments) itr.next();
+
+            if (taskAttachments.getId().equalsIgnoreCase(taskId)) {
+
+                attachmentsDao.delete(taskAttachments);
+
+                response.setStatus(204);
+
+                return "Attachment with  Id: " + taskId + " has been deleted";
+
+            }
+        }
+
+
+
+        response.setStatus(400);
+
+        return "Given Task Id doesn't exists";
 
     }
+
+
+
+
+
+
+    @RequestMapping(value = "/tasks/{id}/attachments", method = RequestMethod.GET)
+    public Object getAttachment(@PathVariable("id") String id, HttpServletRequest request, HttpServletResponse response) {
+
+
+        String taskId = id;
+
+        Iterable<TodoTask> tasks = taskDao.findAll();
+
+        Iterator itr = tasks.iterator();
+
+        while (itr.hasNext()) {
+
+            TodoTask todoTask = (TodoTask) itr.next();
+
+            if (todoTask.getId().equalsIgnoreCase(taskId)) {
+
+                List<TaskAttachments> tal;
+            tal=todoTask.getTaskAttachments();
+
+                        JSONObject jo=new JSONObject();
+
+                response.setStatus(200);
+
+                return "Task Attachment " ;
+
+            }
+        }
+
+
+
+        response.setStatus(401);
+
+        return "Given Task Id doesn't exists";
+
+    }
+
 
 
 }
