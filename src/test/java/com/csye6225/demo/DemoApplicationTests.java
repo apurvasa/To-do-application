@@ -13,6 +13,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class DemoApplicationTests {
 
 
+	@Ignore
 	@Test
 	public void contextLoads() {
 
