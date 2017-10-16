@@ -6,19 +6,18 @@ Team member information such as Name and Email address.
 
 Prerequisites for building and deploying your application locally.
 
-Install Oracle Virtual Box locally and create a Ubuntu 16.04 LTS virtual machine.
-Install Java 8.
-IntelliJ IDE Ultimate version should be installed.
-Git should be installed.
-Tomcat must be installed and configured to IntelliJ IDE
-Gradle depencies should be downloaded.
-Istall MySQL
-Create your Github and TravisCI to buid the application.
+1.Install Oracle Virtual Box locally and create a Ubuntu 16.04 LTS virtual machine.
+2.Install Java 8. 
+3.IntelliJ IDE Ultimate version should be installed.
+4.Git should be installed.
+5.Tomcat must be installed and configured to IntelliJ IDE Gradle depencies should be downloaded. 
+6.Istall MySQL Create your Github and TravisCI to buid the application.
 
 Build and Deploy instructions for web application.
 
-First configure Tomcat 8 and select the proper artificate in the deployment tab.
-Then in the gradle projects window run build project. After successfully completion run the war.
+First configure Tomcat 8 and select the proper artificate in the deployment tab. 
+Then in the gradle projects window run build project. 
+After successfully completion run the war. 
 Last step is to select the Tomcat 8 and hit on run.
 
 Instructions to run unit, integration and/or load tests.
