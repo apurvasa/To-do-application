@@ -444,7 +444,9 @@ public class UserController {
 
 
                                     } else
-                                        return "ID does not exists";
+                                        JsonObject j = new JsonObject();
+                            	        j.addProperty("Error", "ID does not exists");
+                            	        return j.toString();
                                 }
 
 
