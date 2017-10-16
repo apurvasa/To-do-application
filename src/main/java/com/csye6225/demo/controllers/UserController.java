@@ -1,7 +1,9 @@
 package com.csye6225.demo.controllers;
 
+import com.csye6225.demo.bean.TaskAttachments;
 import com.csye6225.demo.bean.TodoTask;
 import com.csye6225.demo.bean.User;
+import com.csye6225.demo.dao.AttachmentsDao;
 import com.csye6225.demo.dao.TaskDao;
 import com.csye6225.demo.dao.UserDao;
 import com.csye6225.demo.services.GenerateUUID;
@@ -9,15 +11,21 @@ import com.google.gson.*;
 import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.charset.Charset;
-import java.util.Base64;
-import java.util.Date;
-import java.util.Iterator;
-
+import java.util.*;
 
 
 @RestController
@@ -33,6 +41,9 @@ public class UserController {
     @Autowired
     private TaskDao taskDao;
 
+
+    @Autowired
+    private AttachmentsDao attachmentsDao;
 
     @RequestMapping(value = "/user/register", method = RequestMethod.POST)
     public Object register(@RequestBody JSONObject jo) {
@@ -163,7 +174,7 @@ public class UserController {
 
 
 
-      return null;
+        return null;
     }
 
     @RequestMapping(value = "/tasks/{id}", method = RequestMethod.PUT)
@@ -205,9 +216,9 @@ public class UserController {
             }
         }
 
-            response.setStatus(400);
+        response.setStatus(400);
 
-            return "Given Task Id doesn't exists";
+        return "Given Task Id doesn't exists";
 
     }
 
@@ -217,7 +228,7 @@ public class UserController {
 
         String taskId = id;
 
-       Iterable<TodoTask> tasks = taskDao.findAll();
+        Iterable<TodoTask> tasks = taskDao.findAll();
 
         Iterator itr = tasks.iterator();
 
@@ -238,14 +249,159 @@ public class UserController {
 
 
 
-            response.setStatus(400);
+        response.setStatus(400);
 
-            return "Given Task Id doesn't exists";
+        return "Given Task Id doesn't exists";
 
+    }
+
+
+
+
+    @RequestMapping(value = "/tasks/{id}/attachments", method = RequestMethod.POST, produces = "application/json", consumes = "multipart/form-data")
+    @ResponseBody
+    public String addAttachments(HttpServletRequest request, HttpServletResponse response, @PathVariable("id") String id, @RequestParam("name") String name,
+                                 @RequestParam("file") MultipartFile file) {
+
+
+        if (!file.isEmpty()) {
+            System.out.println("inside if ");
+
+            try {
+                String taskId = id;
+
+                Iterable<TodoTask> tasks = taskDao.findAll();
+
+                Iterator itr = tasks.iterator();
+
+                while (itr.hasNext()) {
+
+                    TodoTask todoTask = (TodoTask) itr.next();
+
+                    if (todoTask.getId().equalsIgnoreCase(taskId)) {
+                        String fileName = file.getOriginalFilename();
+
+
+                        byte[] bytes = file.getBytes();
+                        Path path = Paths.get("//home//riddhi//Desktop//tmpFiles//"+fileName);
+                        Files.write(path, bytes);
+                        TaskAttachments ta=new TaskAttachments();
+                        ta.setPath(path.toString());
+                        ta.setId(generateUUID.getUUID());
+                        ta.setTodoTask(todoTask);
+                        List<TaskAttachments> tal=new ArrayList<TaskAttachments>();
+                        tal.add(ta);
+                        todoTask.setTaskAttachments(tal);
+                        attachmentsDao.save(ta);
+
+
+                        System.out.println("You successfully uploaded file=" + name);
+                        response.setStatus(200);
+                        return "Saved";
+
+
+                    }
+                    else
+                        return "ID does not exists";
+                }
+
+
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+                response.setStatus(400);
+                        return "Bad Request";
+            }
+        } else {
+            System.out.println("You failed to upload " + name + " because the file was empty.");
+            return "File Empty";
         }
+
+return null;
+    }
+
+
+
+
+
+
+
+    @RequestMapping(value = "/tasks/{id}/attachments/{idAttachments}", method = RequestMethod.DELETE)
+    public String deleteAttachment(@PathVariable("idAttachments") String idAttachments, HttpServletRequest request, HttpServletResponse response) {
+
+
+        String taskId = idAttachments;
+
+        Iterable<TaskAttachments> attachments = attachmentsDao.findAll();
+
+        Iterator itr = attachments.iterator();
+
+        while (itr.hasNext()) {
+
+            TaskAttachments taskAttachments = (TaskAttachments) itr.next();
+
+            if (taskAttachments.getId().equalsIgnoreCase(taskId)) {
+
+                attachmentsDao.delete(taskAttachments);
+
+                response.setStatus(204);
+
+                return "Attachment with  Id: " + taskId + " has been deleted";
+
+            }
+        }
+
+
+
+        response.setStatus(400);
+
+        return "Given Task Id doesn't exists";
+
+    }
+
+
+
+
+
+
+    @RequestMapping(value = "/tasks/{id}/attachments", method = RequestMethod.GET)
+    public Object getAttachment(@PathVariable("id") String id, HttpServletRequest request, HttpServletResponse response) {
+
+
+        String taskId = id;
+
+        Iterable<TodoTask> tasks = taskDao.findAll();
+
+        Iterator itr = tasks.iterator();
+
+        while (itr.hasNext()) {
+
+            TodoTask todoTask = (TodoTask) itr.next();
+
+            if (todoTask.getId().equalsIgnoreCase(taskId)) {
+
+                List<TaskAttachments> tal;
+            tal=todoTask.getTaskAttachments();
+
+                        JSONObject jo=new JSONObject();
+
+                response.setStatus(200);
+
+                return "Task Attachment " ;
+
+            }
+        }
+
+
+
+        response.setStatus(401);
+
+        return "Given Task Id doesn't exists";
+
+    }
+
+
+
 }
-
-
 
 
 

@@ -17,6 +17,7 @@ public class User {
 
     public User(Long userId,String userName, String email,String password){
 
+
         this.userId = userId;
         this.email=email;
         this.userName=userName;

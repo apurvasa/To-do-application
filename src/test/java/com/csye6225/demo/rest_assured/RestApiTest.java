@@ -2,8 +2,6 @@ package com.csye6225.demo.rest_assured;
 
 import io.restassured.RestAssured;
 import static io.restassured.RestAssured.given;
-
-import org.junit.Test;
 import java.net.URI;
 import java.net.URISyntaxException;
 import org.junit.BeforeClass;
@@ -14,6 +12,7 @@ import java.net.URISyntaxException;
 import com.csye6225.demo.bean.User;
 
 public class RestApiTest  {
+
 
 
     @Ignore
