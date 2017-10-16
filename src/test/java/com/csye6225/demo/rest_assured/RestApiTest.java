@@ -1,22 +1,12 @@
 package com.csye6225.demo.rest_assured;
 
 import io.restassured.RestAssured;
-import org.junit.Test;
-
+import static io.restassured.RestAssured.given;
 import java.net.URI;
 import java.net.URISyntaxException;
-
-
-
-
-import static io.restassured.RestAssured.given;
-
-
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-//import org.junit.Ignore;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 import com.csye6225.demo.bean.User;
@@ -24,7 +14,8 @@ import com.csye6225.demo.bean.User;
 public class RestApiTest  {
 
 
-@Ignore
+
+    @Ignore
     @Test
     public void testGetHomePage() throws URISyntaxException {
         RestAssured.when().get(new URI("http://localhost:8080/")).then().statusCode(200);

@@ -1,6 +1,5 @@
 Team member information such as Name and Email address.
 
-
 1) Riddhi Chabhadia     chabhadia.r@husky.neu.edu
 2) Apurva Sawant         sawant.ap@husky.neu.edu
 3) Shubham Patel          patel.shu@husky.neu.edu
@@ -26,7 +25,5 @@ Instructions to run unit, integration and/or load tests.
 
 Inside the src folder go in the test folder then go in the JUint. 
 Inside JUnit go on basic test then right click and run.
-
-
 
 Link to TravisCI build for the project.
