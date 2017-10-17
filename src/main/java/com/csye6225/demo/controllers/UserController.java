@@ -1,23 +1,32 @@
 package com.csye6225.demo.controllers;
 
+import com.csye6225.demo.bean.TaskAttachments;
 import com.csye6225.demo.bean.TodoTask;
 import com.csye6225.demo.bean.User;
+import com.csye6225.demo.dao.AttachmentsDao;
 import com.csye6225.demo.dao.TaskDao;
 import com.csye6225.demo.dao.UserDao;
 import com.csye6225.demo.services.GenerateUUID;
 import com.google.gson.*;
 import org.apache.catalina.servlet4preview.http.HttpServletRequest;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.charset.Charset;
-import java.util.Base64;
-import java.util.Date;
-import java.util.Iterator;
-
+import java.util.*;
 
 
 @RestController
@@ -33,6 +42,9 @@ public class UserController {
     @Autowired
     private TaskDao taskDao;
 
+
+    @Autowired
+    private AttachmentsDao attachmentsDao;
 
     @RequestMapping(value = "/user/register", method = RequestMethod.POST)
     public Object register(@RequestBody JSONObject jo) {
@@ -128,13 +140,17 @@ public class UserController {
 
                             response.setStatus(201);
 
-
-                            return "Task Added " + " Your To Do Task Id is : " + id;
+                            JsonObject j = new JsonObject();
+                            j.addProperty("Information", "Task Added on the id :" + id);
+                            return j.toString();
                         } else {
 
                             response.setStatus(400);
 
-                            return "Description Should have less than 4096 Characters ";
+                            JsonObject j = new JsonObject();
+                            j.addProperty("Information", "Description Should have less than 4096 Characters");
+                            return j.toString();
+
                         }
 
 
@@ -163,90 +179,530 @@ public class UserController {
 
 
 
-      return null;
+        return null;
     }
 
     @RequestMapping(value = "/tasks/{id}", method = RequestMethod.PUT)
     public String updateTask(@RequestBody JSONObject jsonObject, @PathVariable String id, HttpServletRequest request, HttpServletResponse response) {
 
+        final String authorization = request.getHeader("Authorization");
+        if (authorization != null && authorization.startsWith("Basic")) {
 
-        String taskId = id;
+            String base64Credentials = authorization.substring("Basic".length()).trim();
+            String credentials = new String(Base64.getDecoder().decode(base64Credentials),
+                    Charset.forName("UTF-8"));
 
-        String description = jsonObject.get("Description").toString();
+            final String[] values = credentials.split(":", 2);
 
-        Iterable<TodoTask> tasks = taskDao.findAll();
+            String email = values[0];
+            String password = values[1];
 
-        Iterator itr = tasks.iterator();
+            System.out.println(email);
+            System.out.println(password);
 
-        while (itr.hasNext()) {
+            Iterable<User> lu = userDao.findAll();
 
-            TodoTask todo = (TodoTask) itr.next();
+            Iterator itr = lu.iterator();
 
-            if (todo.getId().equalsIgnoreCase(taskId)) {
+            do {
 
-                Long userId = todo.getUsers().getUserId();
+                User u1 = (User) itr.next();
 
-                System.out.println(userId);
+                if (u1.getEmail().equalsIgnoreCase(email)) {
 
-                User user1 = userDao.findOne(userId);
+                    if (BCrypt.checkpw(password, u1.getPassword())) {
 
-                TodoTask tt = new TodoTask(taskId, description);
+                        String taskId = id;
 
-                user1.getTodoTasks().add(tt);
+                        String description = jsonObject.get("Description").toString();
 
-                tt.setUsers(user1);
+                        Iterable<TodoTask> tasks = taskDao.findAll();
 
-                taskDao.save(tt);
+                        Iterator itr1 = tasks.iterator();
 
-                response.setStatus(200);
+                        while (itr1.hasNext()) {
 
-                return "Update to the Task Id: " + taskId + " has been done";
+                            TodoTask todo = (TodoTask) itr1.next();
 
-            }
+                            if (todo.getId().equalsIgnoreCase(taskId)) {
+
+                                Long userId = todo.getUsers().getUserId();
+
+                                System.out.println(userId);
+
+                                User user1 = userDao.findOne(userId);
+
+                                TodoTask tt = new TodoTask(taskId, description);
+
+                                user1.getTodoTasks().add(tt);
+
+                                tt.setUsers(user1);
+
+                                taskDao.save(tt);
+
+                                response.setStatus(200);
+
+                                JsonObject j = new JsonObject();
+                                j.addProperty("Information", "Update to the Task Id: " + taskId + " has been done");
+                                return j.toString();
+
+
+                            }
+                        }
+
+                        response.setStatus(400);
+
+                        JsonObject j = new JsonObject();
+                        j.addProperty("Error", "Given Task Id doesn't exists");
+                        return j.toString();
+
+
+                    }else {
+
+                        JsonObject j = new JsonObject();
+                        j.addProperty("Error", "Password Doesn't Match");
+                        return j.toString();
+                    }
+                }
+
+            } while (itr.hasNext());
+
+            JsonObject j = new JsonObject();
+            j.addProperty("Error", "User With Given Email " + email + " Doest Exist!!!");
+
+            return j.toString();
+        } else {
+
+            JsonObject j = new JsonObject();
+            j.addProperty("Error", "Unauthorized User: You Are Not Logged In");
+
         }
 
-            response.setStatus(400);
-
-            return "Given Task Id doesn't exists";
-
+        return null;
     }
 
     @RequestMapping(value = "/tasks/{id}", method = RequestMethod.DELETE)
     public String deleteTask(@PathVariable String id, HttpServletRequest request, HttpServletResponse response) {
 
 
-        String taskId = id;
+        final String authorization = request.getHeader("Authorization");
+        if (authorization != null && authorization.startsWith("Basic")) {
 
-       Iterable<TodoTask> tasks = taskDao.findAll();
+            String base64Credentials = authorization.substring("Basic".length()).trim();
+            String credentials = new String(Base64.getDecoder().decode(base64Credentials),
+                    Charset.forName("UTF-8"));
 
-        Iterator itr = tasks.iterator();
+            final String[] values = credentials.split(":", 2);
 
-        while (itr.hasNext()) {
+            String email = values[0];
+            String password = values[1];
 
-            TodoTask todoTask = (TodoTask) itr.next();
+            System.out.println(email);
+            System.out.println(password);
 
-            if (todoTask.getId().equalsIgnoreCase(taskId)) {
+            Iterable<User> lu = userDao.findAll();
 
-                taskDao.delete(todoTask);
+            Iterator itr = lu.iterator();
 
-                response.setStatus(204);
+            do {
 
-                return "Task Id: " + taskId + " has been deleted";
+                User u1 = (User) itr.next();
 
+                if (u1.getEmail().equalsIgnoreCase(email)) {
+
+                    if (BCrypt.checkpw(password, u1.getPassword())) {
+
+
+
+                        String taskId = id;
+
+                        Iterable<TodoTask> tasks = taskDao.findAll();
+
+                        Iterator itr1 = tasks.iterator();
+
+                        while (itr1.hasNext()) {
+
+                            TodoTask todoTask = (TodoTask) itr1.next();
+
+                            if (todoTask.getId().equalsIgnoreCase(taskId)) {
+
+                                taskDao.delete(todoTask);
+                                response.setStatus(204);
+
+                                JsonObject j = new JsonObject();
+                                j.addProperty("Information", "Task Id: " +taskId+ " has been deleted");
+                                return j.toString();
+
+
+                            }
+                        }
+
+                        response.setStatus(400);
+
+                        JsonObject j = new JsonObject();
+                        j.addProperty("Error", "Given Task Id doesn't exists");
+                        return j.toString();
+
+
+                    }else {
+
+                        JsonObject j = new JsonObject();
+                        j.addProperty("Error", "Password Doesn't Match");
+                        return j.toString();
+                    }
+                }
+
+            } while (itr.hasNext());
+
+            JsonObject j = new JsonObject();
+            j.addProperty("Error", "User With Given Email " + email + " Doest Exist!!!");
+
+            return j.toString();
+        } else {
+
+            JsonObject j = new JsonObject();
+            j.addProperty("Error", "Unauthorized User: You Are Not Logged In");
+
+        }
+
+        return null;
+    }
+
+
+
+    @RequestMapping(value = "/tasks/{id}/attachments", method = RequestMethod.POST, produces = "application/json", consumes = "multipart/form-data")
+    @ResponseBody
+    public String addAttachments(HttpServletRequest request, HttpServletResponse response, @PathVariable("id") String id, @RequestParam("name") String name,
+                                 @RequestParam("file") MultipartFile file) {
+
+
+        if (!file.isEmpty()) {
+            System.out.println("inside if ");
+
+            final String authorization = request.getHeader("Authorization");
+            if (authorization != null && authorization.startsWith("Basic")) {
+
+                String base64Credentials = authorization.substring("Basic".length()).trim();
+                String credentials = new String(Base64.getDecoder().decode(base64Credentials),
+                        Charset.forName("UTF-8"));
+
+                final String[] values = credentials.split(":", 2);
+
+                String email = values[0];
+                String password = values[1];
+
+                System.out.println(email);
+                System.out.println(password);
+
+                Iterable<User> lu = userDao.findAll();
+
+                Iterator itr = lu.iterator();
+
+                do {
+
+                    User u1 = (User) itr.next();
+
+                    if (u1.getEmail().equalsIgnoreCase(email)) {
+
+                        if (BCrypt.checkpw(password, u1.getPassword())) {
+
+                            try {
+                                String taskId = id;
+
+                                Iterable<TodoTask> tasks = taskDao.findAll();
+
+                                Iterator itr1 = tasks.iterator();
+
+                                while (itr1.hasNext()) {
+
+                                    TodoTask todoTask = (TodoTask) itr1.next();
+
+                                    if (todoTask.getId().equalsIgnoreCase(taskId)) {
+
+                                        String fileName = file.getOriginalFilename();
+
+
+                                        byte[] bytes = file.getBytes();
+                                        Path path = Paths.get("//home//riddhi//Desktop//tmpFiles//" + fileName);
+                                        Files.write(path, bytes);
+
+                                        TaskAttachments ta = new TaskAttachments();
+
+                                        ta.setPath(path.toString());
+                                        ta.setId(generateUUID.getUUID());
+                                        ta.setTodoTask(todoTask);
+
+                                        List<TaskAttachments> tal = new ArrayList<TaskAttachments>();
+                                        tal.add(ta);
+                                        todoTask.setTaskAttachments(tal);
+                                        attachmentsDao.save(ta);
+
+
+                                        System.out.println("You successfully uploaded file=" + name);
+                                        response.setStatus(200);
+                                        return "Saved";
+
+
+                                    } else
+                                        return "ID does not exists";
+                                }
+
+
+                            } catch (Exception e) {
+                                System.out.println(e.getMessage());
+                                response.setStatus(400);
+                                return "Bad Request";
+                            }
+                        }else {
+
+                            JsonObject j = new JsonObject();
+                            j.addProperty("Error", "Password Doesn't Match");
+                            return j.toString();
+                        }
+
+                    }
+                }while (itr.hasNext());
+
+                JsonObject j = new JsonObject();
+                j.addProperty("Error", "User With Given Email " + email + " Doest Exist!!!");
+
+                return j.toString();
+            } else {
+
+                JsonObject j = new JsonObject();
+                j.addProperty("Error", "Unauthorized User: You Are Not Logged In");
+                return j.toString();
             }
+        }else {
+            System.out.println("You failed to upload " + name + " because the file was empty.");
+
+            JsonObject j = new JsonObject();
+            j.addProperty("Error", "File Empty");
+            return j.toString();
+
         }
 
 
+    }
 
-            response.setStatus(400);
 
-            return "Given Task Id doesn't exists";
 
+
+
+
+
+    @RequestMapping(value = "/tasks/{id}/attachments/{idAttachments}", method = RequestMethod.DELETE)
+    public String deleteAttachment(@PathVariable("idAttachments") String idAttachments, HttpServletRequest request, HttpServletResponse response) {
+
+        final String authorization = request.getHeader("Authorization");
+        if (authorization != null && authorization.startsWith("Basic")) {
+
+            String base64Credentials = authorization.substring("Basic".length()).trim();
+            String credentials = new String(Base64.getDecoder().decode(base64Credentials),
+                    Charset.forName("UTF-8"));
+
+            final String[] values = credentials.split(":", 2);
+
+            String email = values[0];
+            String password = values[1];
+
+            System.out.println(email);
+            System.out.println(password);
+
+            Iterable<User> lu = userDao.findAll();
+
+            Iterator itr1 = lu.iterator();
+
+            do {
+
+                User u1 = (User) itr1.next();
+
+                if (u1.getEmail().equalsIgnoreCase(email)) {
+
+                    if (BCrypt.checkpw(password, u1.getPassword())) {
+
+                        try {
+                            String taskId = idAttachments;
+
+                            Iterable<TaskAttachments> attachments = attachmentsDao.findAll();
+
+                            Iterator itr = attachments.iterator();
+
+                            while (itr.hasNext()) {
+
+                                TaskAttachments taskAttachments = (TaskAttachments) itr.next();
+
+                                if (taskAttachments.getId().equalsIgnoreCase(taskId)) {
+
+                                    attachmentsDao.delete(taskAttachments);
+
+                                    response.setStatus(204);
+
+                                    JsonObject j = new JsonObject();
+                                    j.addProperty("Information", "Attachment with  Id: " + taskId + " has been deleted");
+                                    return j.toString();
+
+
+
+                                }
+                            }
+
+
+
+                            response.setStatus(400);
+
+                            JsonObject j = new JsonObject();
+                            j.addProperty("Error", "Given Task Id doesn't exists");
+                            return j.toString();
+
+
+
+
+                        } catch (Exception e) {
+                            System.out.println(e.getMessage());
+                            response.setStatus(400);
+                            return "Bad Request";
+                        }
+                    }else {
+
+                        JsonObject j = new JsonObject();
+                        j.addProperty("Error", "Password Doesn't Match");
+                        return j.toString();
+                    }
+
+                }
+            }while (itr1.hasNext());
+
+            JsonObject j = new JsonObject();
+            j.addProperty("Error", "User With Given Email " + email + " Doest Exist!!!");
+
+            return j.toString();
+        } else {
+
+            JsonObject j = new JsonObject();
+            j.addProperty("Error", "Unauthorized User: You Are Not Logged In");
+            return j.toString();
         }
+
+
+    }
+
+
+
+
+
+
+    @RequestMapping(value = "/tasks/{id}/attachments", method = RequestMethod.GET)
+    public Object getAttachment(@PathVariable("id") String id, HttpServletRequest request, HttpServletResponse response) {
+
+
+        final String authorization = request.getHeader("Authorization");
+        if (authorization != null && authorization.startsWith("Basic")) {
+
+            String base64Credentials = authorization.substring("Basic".length()).trim();
+            String credentials = new String(Base64.getDecoder().decode(base64Credentials),
+                    Charset.forName("UTF-8"));
+
+            final String[] values = credentials.split(":", 2);
+
+            String email = values[0];
+            String password = values[1];
+
+            System.out.println(email);
+            System.out.println(password);
+
+            Iterable<User> lu = userDao.findAll();
+
+            Iterator itr1 = lu.iterator();
+
+            do {
+
+                User u1 = (User) itr1.next();
+
+                if (u1.getEmail().equalsIgnoreCase(email)) {
+
+                    if (BCrypt.checkpw(password, u1.getPassword())) {
+
+                        try {
+
+                            String taskId = id;
+
+                            Iterable<TodoTask> tasks = taskDao.findAll();
+
+                            Iterator itr = tasks.iterator();
+
+                            while (itr.hasNext()) {
+
+                                TodoTask todoTask = (TodoTask) itr.next();
+
+                                if (todoTask.getId().equalsIgnoreCase(taskId)) {
+
+                                    List<TaskAttachments> tal;
+
+                                    tal=todoTask.getTaskAttachments();
+
+                                   JsonArray ja = new JsonArray();
+
+                                    for(TaskAttachments ta : tal){
+
+                                        JsonObject jo = new JsonObject();
+                                        jo.addProperty("Attachment",ta.toString());
+
+                                    ja.add(jo);
+
+                                    }
+
+
+
+                                    response.setStatus(200);
+
+                                    return ja ;
+
+                                }
+                            }
+
+
+
+                            response.setStatus(401);
+
+                            JsonObject j = new JsonObject();
+                            j.addProperty("Error", "Given Task Id doesn't exists");
+                            return j.toString();
+
+
+
+
+
+
+                    } catch (Exception e) {
+                            System.out.println(e.getMessage());
+                            response.setStatus(400);
+                            return "Bad Request";
+                        }
+                    } else {
+
+                        JsonObject j = new JsonObject();
+                        j.addProperty("Error", "Password Doesn't Match");
+                        return j.toString();
+                    }
+
+                }
+            } while (itr1.hasNext());
+
+            JsonObject j = new JsonObject();
+            j.addProperty("Error", "User With Given Email " + email + " Doest Exist!!!");
+
+            return j.toString();
+        } else {
+
+            JsonObject j = new JsonObject();
+            j.addProperty("Error", "Unauthorized User: You Are Not Logged In");
+            return j.toString();
+        }
+
+
+    }
 }
-
-
-
 
 
 
