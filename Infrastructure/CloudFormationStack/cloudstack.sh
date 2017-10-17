@@ -20,19 +20,10 @@ export SUBNET_ID=$(aws ec2 describe-subnets --filters "Name=vpc-id, Values=$VPC_
 echo $SUBNET_ID
 
 echo $SECURITY_GROUP
-echo "Launching an instance"
-INSTANCE_ID=$(aws ec2 run-instances --image-id $AMI --count 1 --instance-type $INSTANCE_TYPE  --security-groups csye6225-fall2017-webapp  --region us-east-1 --block-device-mappings "[{\"DeviceName\":\"/dev/sdf\",\"Ebs\":{\"VolumeSize\":16,\"VolumeType\":\"gp2\",\"DeleteOnTermination\":false}}]" --disable-api-termination --query "Instances[0].InstanceId" --output text)
-
-echo $INSTANCE_ID
 
  
- 
 
- 
- 
-
-echo "Done setting A record set"
-echo "{\"AWSTemplateFormatVersion\": \"2010-09-09\",\"Description\": \"Sample CloudFormation Template for CSYE 6225 - Fall 2017\",\"Resources\": {\"EC2Instance\": {\"Type\": \"AWS::EC2::Instance\",\"Properties\": {\"KeyName\":\"team6KP\",\"ImageId\": \"ami-cd0f5cb6\",\"InstanceType\": \"t2.micro\",\"DisableApiTermination\":\"True\",\"SecurityGroupIds\": [{\"Fn::GetAtt\": [\"WebServerSecurityGroup\",\"GroupId\"]}],\"BlockDeviceMappings\":[{\"DeviceName\":\"/dev/sda1\",\"Ebs\":{\"VolumeSize\":16,\"VolumeType\":\"gp2\"}}],\"SubnetId\": \""$SUBNET_ID"\"}},\"WebServerSecurityGroup\": {\"Type\": \"AWS::EC2::SecurityGroup\",\"Properties\": {\"GroupDescription\": \"Enable HTTP access via port 80, SSH access via port 22\",\"VpcId\": \""$VPC_ID"\",\"GroupName\":\"csye6225-fall2017-$stackName-webapp\",\"SecurityGroupIngress\": [{\"IpProtocol\": \"tcp\",\"FromPort\": \"80\",\"ToPort\": \"80\",\"CidrIp\": \"0.0.0.0/0\"},{\"IpProtocol\": \"tcp\",\"FromPort\": \"22\",\"ToPort\": \"22\",\"CidrIp\": \"0.0.0.0/0\"},{\"IpProtocol\": \"tcp\",\"FromPort\": \"443\",\"ToPort\": \"443\",\"CidrIp\": \"0.0.0.0/0\"}]}},\"MyDNSRecord\": {\"Type\":\"AWS::Route53::RecordSet\",\"Properties\" : {\"Comment\" : \"DNS name for my instance.\",\"Name\" : \""$DOMAIN_NAME"\",\"HostedZoneId\" : \""$HOSTED_ZONE_ID"\",\"Type\" : \"A\",\"TTL\" : \"900\",\"ResourceRecords\" : [{ \"Fn::GetAtt\" : [ \"EC2Instance\", \"PublicIp\" ]}]}}}}" > /home/riddhi/Desktop/abc.json
+echo "{\"AWSTemplateFormatVersion\": \"2010-09-09\",\"Description\": \"Sample CloudFormation Template for CSYE 6225 - Fall 2017\",\"Resources\": {\"EC2Instance\": {\"Type\": \"AWS::EC2::Instance\",\"Properties\": {\"KeyName\":\"asssh\",\"ImageId\": \"ami-cd0f5cb6\",\"InstanceType\": \"t2.micro\",\"DisableApiTermination\":\"True\",\"SecurityGroupIds\": [{\"Fn::GetAtt\": [\"WebServerSecurityGroup\",\"GroupId\"]}],\"BlockDeviceMappings\":[{\"DeviceName\":\"/dev/sda1\",\"Ebs\":{\"VolumeSize\":16,\"VolumeType\":\"gp2\"}}],\"SubnetId\": \""$SUBNET_ID"\"}},\"WebServerSecurityGroup\": {\"Type\": \"AWS::EC2::SecurityGroup\",\"Properties\": {\"GroupDescription\": \"Enable HTTP access via port 80, SSH access via port 22\",\"VpcId\": \""$VPC_ID"\",\"GroupName\":\"csye6225-fall2017-$stackName-webapp\",\"SecurityGroupIngress\": [{\"IpProtocol\": \"tcp\",\"FromPort\": \"80\",\"ToPort\": \"80\",\"CidrIp\": \"0.0.0.0/0\"},{\"IpProtocol\": \"tcp\",\"FromPort\": \"22\",\"ToPort\": \"22\",\"CidrIp\": \"0.0.0.0/0\"},{\"IpProtocol\": \"tcp\",\"FromPort\": \"443\",\"ToPort\": \"443\",\"CidrIp\": \"0.0.0.0/0\"}]}},\"MyDNSRecord\": {\"Type\":\"AWS::Route53::RecordSet\",\"Properties\" : {\"Comment\" : \"DNS name for my instance.\",\"Name\" : \""$DOMAIN_NAME"\",\"HostedZoneId\" : \""$HOSTED_ZONE_ID"\",\"Type\" : \"A\",\"TTL\" : \"900\",\"ResourceRecords\" : [{ \"Fn::GetAtt\" : [ \"EC2Instance\", \"PublicIp\" ]}]}}}}" > /home/riddhi/abc.json
 
 
 aws cloudformation create-stack --stack-name $1 --template-body file:///home/riddhi/Desktop/abc.json
@@ -75,11 +66,17 @@ aws route53 change-resource-record-sets --hosted-zone-id $ZONE_ID --change-batch
         \"TTL\": 60,
         \"ResourceRecords\": [
           {
-            \"Value\": \"$PUBLIC_IP\"
+            \"Value\": \"$PublicIp\"
           }
         ]
       }
     }
   ]
 }"
+
+
+echo "Done setting A record set"
+
+
+
 

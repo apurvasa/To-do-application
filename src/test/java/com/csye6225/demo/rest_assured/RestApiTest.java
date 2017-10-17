@@ -1,14 +1,11 @@
 package com.csye6225.demo.rest_assured;
 
 import io.restassured.RestAssured;
+import java.net.URISyntaxException;
 import static io.restassured.RestAssured.given;
-
-
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-//import org.junit.Ignore;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 import com.csye6225.demo.bean.User;
@@ -17,10 +14,11 @@ public class RestApiTest  {
 
 
 @Ignore
-    @Test
-    public void testGetHomePage() throws URISyntaxException {
+@Test
+public void testGetHomePage() throws URISyntaxException {
         RestAssured.when().get(new URI("http://localhost:8080/")).then().statusCode(200);
     }
+
 /*
 
     @Test
@@ -38,5 +36,6 @@ public class RestApiTest  {
                 .when().post("/user/register").then()
                 .statusCode(200);
     }*/
+
 
 }

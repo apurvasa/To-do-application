@@ -5,8 +5,15 @@
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/.gradle" />
       <excludeFolder url="file://$MODULE_DIR$/build" />
+<<<<<<< HEAD
     </content>
     <orderEntry type="jdk" jdkName="1.8" jdkType="JavaSDK" />
+=======
+
+      <excludeFolder url="file://$MODULE_DIR$/out" />
+   </content>
+    <orderEntry type="inheritedJdk" />
+>>>>>>> assignment5
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>

@@ -1,9 +1,8 @@
 Team member information such as Name and Email address.
 
-Riddhi Chabhadia chabhadia.r@husky.neu.edu
-Apurva Sawant sawant.ap@husky.neu.edu
-Shubham Patel patel.shu@husky.neu.edu
-
+1) Riddhi Chabhadia     chabhadia.r@husky.neu.edu
+2) Apurva Sawant         sawant.ap@husky.neu.edu
+3) Shubham Patel          patel.shu@husky.neu.edu
 
 Prerequisites for building and deploying your application locally.
 
@@ -16,10 +15,14 @@ Prerequisites for building and deploying your application locally.
 
 Build and Deploy instructions for web application.
 
-First configure Tomcat 8 and select the proper artificate in the deployment tab. Then in the gradle projects window run build project. After successfully completion run the war. Last step is to select the Tomcat 8 and hit on run.
+First configure Tomcat 8 and select the proper artificate in the deployment tab. 
+Then in the gradle projects window run build project. 
+After successfully completion run the war. 
+Last step is to select the Tomcat 8 and hit on run.
 
 Instructions to run unit, integration and/or load tests.
 
-Inside the src folder go in the test folder then go in the JUint. Inside JUnit go on basic test then right click and run.
+Inside the src folder go in the test folder then go in the JUint. 
+Inside JUnit go on basic test then right click and run.
 
 Link to TravisCI build for the project.
