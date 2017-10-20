@@ -7,17 +7,15 @@ install: true
 
 script:
   - ./gradlew build
-
-after_sucess:
- - mkdir codedeploy
- - zip -r csye6225-${TRAVIS_JOB_NUMBER}.zip build/libs/ROOT.war appspec.yml
- - ls -al
- - mv csye6225-${TRAVIS_JOB_NUMBER}.zip codedeploy/
- - ls -al
- - pwd
- - cd codedeploy
- - ls -al
- - pwd
+  - mkdir codedeploy
+  - zip -r csye6225-${TRAVIS_JOB_NUMBER}.zip build/libs/ROOT.war appspec.yml
+  - ls -al
+  - mv csye6225-${TRAVIS_JOB_NUMBER}.zip codedeploy/
+  - ls -al
+  - pwd
+  - cd codedeploy
+  - ls -al
+  - pwd
 
 before-deploy:
  - cd ..
