@@ -6,8 +6,7 @@ sudo: false
 install: true
 
 script:
-  - ./gradlew war
-  - ./gradlew test
+  - ./gradlew build
 
 after_sucess:
 - mkdir codedeploy
