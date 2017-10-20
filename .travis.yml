@@ -24,15 +24,16 @@ before_deploy:
  - cd..
 
 
+
 deploy:
- -provider: s3
-  access_key_id: AKIAILJNNSYHRZPOQLNA
-  secret_access_key:
+ - provider: s3
+   access_key_id: AKIAILJNNSYHRZPOQLNA
+   secret_access_key:
     secure: "R1b+k89DIYfn/w3P5tZbBvuu34qzZtx41248eUO9M9f8hDSUQ3/l+x8g/m4thSDw+OWtvTyUMkjws3jGzn8ViFrJvvgQecuFyZOa8zg2+sEdbC+R/z62IUSn/I4upWrCihnbKcFNXyb10fmomFzvy2YXpfTR6OOtCw210NcezNlZRjVM1idKmnWqP5I1pClQ8xFdhbXTapVEQqq9/9BAaNWGMksUiVnLSgLTS0rrR1CrZ2iI3CCN/mgVc/VujeLbq8J/QVEUq1k4/fX+NoUF3Z54U8+cmOG/rG/l8JE+LW1tqtf2kAOR/Mc3F2JROiQ++tdNcJgYfuTIIFIn62dCtQjQjyuXiSqFiOCgNZtYE8AQFMu1gkVuLgnFy6qxFoBN5vrqKjH+/Zj74fCx8rVBydTu4W/5WsnMA3dLfEblLLyNI5cJBbHF7/pYv4Lgbq6dGk+nnr1PPw21Qpvlw3ENrFkNHhWIMCyu4R1R45c0lpO3sa7KkMD4c5ayKOwsGVlA0wIBWpg5OO7KV5ykZZpj1tZ2MACRxQoXn/tyOc/BgV463DgQm6wT4bm+X0bbxlNZkvZbT6U/jKu9KevlJd3baDUSIg5iim8+Gq1T+vaWqdpfMseAZxGahsbyNaefGo/XWTKVa52r7DI97boF3e01dq8Fb++fJYgVOBYvbgdsWqs="
-  loacl_dir: codedeploy
-  bucket: code-deploy.csye6225-fall2017-chabhadiar.me
-  region: us-east-1
-  skip_cleanup: true
+   loacl_dir: codedeploy
+   bucket: code-deploy.csye6225-fall2017-chabhadiar.me
+   region: us-east-1
+   skip_cleanup: true
 
 notifications:
   email:
