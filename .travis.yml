@@ -34,6 +34,7 @@ deploy:
    bucket: code-deploy.csye6225-fall2017-chabhadiar.me
    region: us-east-1
    skip_cleanup: true
+   all_branches: true
 
 notifications:
   email:
