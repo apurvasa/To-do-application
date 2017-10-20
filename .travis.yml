@@ -9,15 +9,15 @@ script:
   - ./gradlew build
 
 after_success:
- -mkdir codedeploy
- -zip -r TestJavaProject-${TRAVIS_JOB_NUMBER}.zip build/lib/ROOT.war appspec.yml
- -ls -al
- -mv TestJavaProject-${TRAVIS_JOB_NUMBER}.zip codedeploy/
- -ls -al
- -pwd
- -cd codedeploy
- -ls -al
- -pwd
+ - mkdir codedeploy
+ - zip -r TestJavaProject-${TRAVIS_JOB_NUMBER}.zip build/lib/ROOT.war appspec.yml
+ - ls -al
+ - mv TestJavaProject-${TRAVIS_JOB_NUMBER}.zip codedeploy/
+ - ls -al
+ - pwd
+ - cd codedeploy
+ - ls -al
+ - pwd
 
 
 before_deploy:
