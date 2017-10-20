@@ -9,6 +9,29 @@ script:
   - ./gradlew war
   - ./gradlew test
 
+after_sucess:
+- mkdir codedeploy
+- zip -r csye6225-${TRAVIS_JOB_NUMBER}.zip build/libs/root.war appspec.yml
+- ls -al
+- mv csye6225-${TRAVIS_JOB_NUMBER}.zip codedeploy/
+- ls -al
+- pwd
+- cd codedeploy
+- ls -al
+- pwd
+
+before-deploy:
+- cd ..
+
+deploy:
+- provider:s3
+  access_key_id: AKIAJOL6HUEB7XIADEUA
+  secret_access_key:
+   secure: "ZQuBgjbf4W7E/FIR5GRGoT6YciUWQ6y/1f/MJ1p/W2W12PY1kQnBNQtGQRfrbU1n2QUTS4D12AqYDbXYStRLT9h2dbZZtmdwVxw+QAjSAwUZGi15+iLCU3HcoNL/R4eERJoYR1lB9CDWVxaicA+C3d9Y597wd9zibiBkR0nOwQXCTsYl2frWDVkSG97LEu1okIvG9qXK9pHFIvTEnC6NL0Ftn+MAnApwNhN2cAcgy2k8oXrw+QmiecYnRBvTO36Nhd9eIjIJERm9PrwF7dG3AEvIPDUXwT2JYesGCTo9vzgNQu5A9R0dzMZsN6qKlC2y/J29QQEJamDD7zMHp05xQtXDOIx6LsbRbN5TWuJJeFkhWosbIEfVW70N9UeDusSswTqqQxaMfSyBBrkpIVKsY/Zgb1Cu1zPVhwBCjrQQkyLL4tbnxtiEFkz4Ke8SFt9pU1tV4ZyNxN6zNC4lKBzu7S9TGxGww0v9MJG11RBacdXHQ5sGoss6bJZ4sb8RMhRuaXo3kdkS4biRktmhonJD/yxXeydmVJ7kTegaiVrwkGKsMcGJwlb3svLy7d5xOen+uEFeYpZZfbhYJEUAuAvpFqU9suzyhhXPLGRlv4F27iaB7VLMIJ7NBYg66qBS8l0aiibDo2oBC5GSFnNgUUWuhZdaUgBbQ7cnmDC6kXv2gxI="
+  local_dir: codedeploy
+  bucket: code-deploy.csye6225.com
+  region: us-east-1
+  skip_cleanup: true
 
 notifications:
   email:
