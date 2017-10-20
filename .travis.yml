@@ -10,7 +10,7 @@ script:
 
 after_sucess:
 - mkdir codedeploy
-- zip -r csye6225-${TRAVIS_JOB_NUMBER}.zip build/libs/root.war appspec.yml
+- zip -r csye6225-${TRAVIS_JOB_NUMBER}.zip build/libs/ROOT.war appspec.yml
 - ls -al
 - mv csye6225-${TRAVIS_JOB_NUMBER}.zip codedeploy/
 - ls -al
