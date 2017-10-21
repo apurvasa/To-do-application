@@ -16,7 +16,6 @@ script:
   - cd codedeploy
   - ls -al
   - pwd
-  - cd ..
 
 before-deploy:
   - ls -al
