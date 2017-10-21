@@ -19,6 +19,7 @@
 build/**/*
 .gradle/**/*
 /out/
+.idea/workspace.xml
 
 ### NetBeans ###
 nbproject/private/
