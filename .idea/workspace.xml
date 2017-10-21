@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="c655b074-71c6-4280-a299-7ba65de85435" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/csye6225/demo/controllers/UserController.java" afterPath="$PROJECT_DIR$/src/main/java/com/csye6225/demo/controllers/UserController.java" />
-    </list>
+    <list default="true" id="c655b074-71c6-4280-a299-7ba65de85435" name="Default" comment="" />
     <ignored path="$PROJECT_DIR$/.gradle/" />
     <ignored path="$PROJECT_DIR$/build/" />
     <ignored path="$PROJECT_DIR$/out/" />
@@ -83,11 +81,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="UserController.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="UserController.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/csye6225/demo/controllers/UserController.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="461">
-              <caret line="546" column="0" lean-forward="true" selection-start-line="546" selection-start-column="0" selection-end-line="546" selection-end-column="0" />
+            <state relative-caret-position="-25">
+              <caret line="618" column="16" lean-forward="false" selection-start-line="618" selection-start-column="16" selection-end-line="618" selection-end-column="16" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -131,10 +129,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name=".travis.yml" pinned="false" current-in-tab="false">
+      <file leaf-file-name=".travis.yml" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/.travis.yml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="459">
+            <state relative-caret-position="684">
               <caret line="38" column="14" lean-forward="false" selection-start-line="38" selection-start-column="14" selection-end-line="38" selection-end-column="14" />
               <folding />
             </state>
@@ -1055,7 +1053,7 @@
       <workItem from="1508033140116" duration="1688000" />
       <workItem from="1508289764785" duration="556000" />
       <workItem from="1508458140983" duration="3922000" />
-      <workItem from="1508615841990" duration="295000" />
+      <workItem from="1508615841990" duration="504000" />
     </task>
     <servers />
   </component>
@@ -1065,7 +1063,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="67651000" />
+    <option name="totallyTimeSpent" value="67860000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="67" y="-4" width="1207" height="677" extended-state="6" />
@@ -1501,14 +1499,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/.travis.yml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="459">
-          <caret line="38" column="14" lean-forward="false" selection-start-line="38" selection-start-column="14" selection-end-line="38" selection-end-column="14" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Infrastructure/aws/CloudStack/create-csye6225-cloudformation-stack.sh">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="342">
@@ -1519,11 +1509,19 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/csye6225/demo/controllers/UserController.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="461">
-          <caret line="546" column="0" lean-forward="true" selection-start-line="546" selection-start-column="0" selection-end-line="546" selection-end-column="0" />
+        <state relative-caret-position="-25">
+          <caret line="618" column="16" lean-forward="false" selection-start-line="618" selection-start-column="16" selection-end-line="618" selection-end-column="16" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.travis.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="684">
+          <caret line="38" column="14" lean-forward="false" selection-start-line="38" selection-start-column="14" selection-end-line="38" selection-end-column="14" />
+          <folding />
         </state>
       </provider>
     </entry>
