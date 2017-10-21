@@ -372,7 +372,7 @@ public class UserController {
 
     @RequestMapping(value = "/tasks/{id}/attachments", method = RequestMethod.POST, produces = "application/json", consumes = "multipart/form-data")
     @ResponseBody
-    public String addAttachments(HttpServletRequest request, HttpServletResponse response, @PathVariable("id") String id, @RequestParam("name") String name,
+    public String addAttachments(HttpServletRequest request, HttpServletResponse response, @PathVariable("id") String id,
                                  @RequestParam("file") MultipartFile file) {
 
 
@@ -407,8 +407,9 @@ public class UserController {
                         if (BCrypt.checkpw(password, u1.getPassword())) {
 
                             try {
+                                System.out.println("id and pass correct");
                                 String taskId = id;
-
+                                boolean flag = false;
                                 Iterable<TodoTask> tasks = taskDao.findAll();
 
                                 Iterator itr1 = tasks.iterator();
@@ -416,14 +417,14 @@ public class UserController {
                                 while (itr1.hasNext()) {
 
                                     TodoTask todoTask = (TodoTask) itr1.next();
-
+                                    System.out.println("task id: "+todoTask.getId());
                                     if (todoTask.getId().equalsIgnoreCase(taskId)) {
 
                                         String fileName = file.getOriginalFilename();
 
 
                                         byte[] bytes = file.getBytes();
-                                        Path path = Paths.get("//home//riddhi//Desktop//tmpFiles//" + fileName);
+                                        Path path = Paths.get(fileName);
                                         Files.write(path, bytes);
 
                                         TaskAttachments ta = new TaskAttachments();
@@ -437,14 +438,17 @@ public class UserController {
                                         todoTask.setTaskAttachments(tal);
                                         attachmentsDao.save(ta);
 
-
-                                        System.out.println("You successfully uploaded file=" + name);
+                                        flag = true;
+                                        System.out.println("You successfully uploaded file");
                                         response.setStatus(200);
                                         return "Saved";
 
 
-                                    } else
-                                        return "ID does not exists";
+                                    } //else
+                                        //return "ID does not exists";
+                                }
+                                if (!flag){
+                                    return "ID does not exists";
                                 }
 
 
@@ -474,7 +478,7 @@ public class UserController {
                 return j.toString();
             }
         }else {
-            System.out.println("You failed to upload " + name + " because the file was empty.");
+            System.out.println("You failed to upload  because the file was empty.");
 
             JsonObject j = new JsonObject();
             j.addProperty("Error", "File Empty");
@@ -492,7 +496,7 @@ public class UserController {
 
 
     @RequestMapping(value = "/tasks/{id}/attachments/{idAttachments}", method = RequestMethod.DELETE)
-    public String deleteAttachment(@PathVariable("idAttachments") String idAttachments, HttpServletRequest request, HttpServletResponse response) {
+    public String deleteAttachment(@PathVariable("id") long  todotaskid,@PathVariable("idAttachments") String idAttachments, HttpServletRequest request, HttpServletResponse response) {
 
         final String authorization = request.getHeader("Authorization");
         if (authorization != null && authorization.startsWith("Basic")) {
@@ -523,6 +527,7 @@ public class UserController {
 
                         try {
                             String taskId = idAttachments;
+                            TodoTask task=taskDao.findOne(todotaskid);
 
                             Iterable<TaskAttachments> attachments = attachmentsDao.findAll();
 
@@ -532,7 +537,7 @@ public class UserController {
 
                                 TaskAttachments taskAttachments = (TaskAttachments) itr.next();
 
-                                if (taskAttachments.getId().equalsIgnoreCase(taskId)) {
+                                if (taskAttachments.getId().equalsIgnoreCase(taskId) && task.getUsers()==u1) {
 
                                     attachmentsDao.delete(taskAttachments);
 
@@ -545,6 +550,7 @@ public class UserController {
 
 
                                 }
+                                else return "Not Authorized";
                             }
 
 
@@ -635,7 +641,7 @@ public class UserController {
 
                                 TodoTask todoTask = (TodoTask) itr.next();
 
-                                if (todoTask.getId().equalsIgnoreCase(taskId)) {
+                                if (todoTask.getId().equalsIgnoreCase(taskId) && todoTask.getUsers()==u1) {
 
                                     List<TaskAttachments> tal;
 
@@ -658,7 +664,7 @@ public class UserController {
 
                                     return ja ;
 
-                                }
+                                } else return "unauthorised";
                             }
 
 
