@@ -496,7 +496,8 @@ public class UserController {
 
 
     @RequestMapping(value = "/tasks/{id}/attachments/{idAttachments}", method = RequestMethod.DELETE)
-    public String deleteAttachment(@PathVariable("id") long  todotaskid,@PathVariable("idAttachments") String idAttachments, HttpServletRequest request, HttpServletResponse response) {
+    public String deleteAttachment(@PathVariable("id") long todotaskid,@PathVariable("idAttachments") String idAttachments, HttpServletRequest request, HttpServletResponse response) {
+
 
         final String authorization = request.getHeader("Authorization");
         if (authorization != null && authorization.startsWith("Basic")) {
@@ -526,7 +527,9 @@ public class UserController {
                     if (BCrypt.checkpw(password, u1.getPassword())) {
 
                         try {
-                            String taskId = idAttachments;
+
+                            String attachmentId = idAttachments;
+
                             TodoTask task=taskDao.findOne(todotaskid);
 
                             Iterable<TaskAttachments> attachments = attachmentsDao.findAll();
@@ -537,14 +540,16 @@ public class UserController {
 
                                 TaskAttachments taskAttachments = (TaskAttachments) itr.next();
 
-                                if (taskAttachments.getId().equalsIgnoreCase(taskId) && task.getUsers()==u1) {
+
+                                if (taskAttachments.getId().equalsIgnoreCase(attachmentId) && taskAttachments.getTodoTask()==task && task.getUsers()==u1) {
+
 
                                     attachmentsDao.delete(taskAttachments);
 
                                     response.setStatus(204);
 
                                     JsonObject j = new JsonObject();
-                                    j.addProperty("Information", "Attachment with  Id: " + taskId + " has been deleted");
+                                    j.addProperty("Information", "Attachment with  Id: " + attachmentId + " has been deleted");
                                     return j.toString();
 
 
