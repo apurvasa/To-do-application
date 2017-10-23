@@ -224,7 +224,7 @@ public class UserController {
 
                             TodoTask todo = (TodoTask) itr1.next();
 
-                            if (todo.getId().equalsIgnoreCase(taskId)) {
+                            if (todo.getId().equalsIgnoreCase(taskId) && todo.getUsers()==u1) {
 
                                 Long userId = todo.getUsers().getUserId();
 
@@ -324,7 +324,7 @@ public class UserController {
 
                             TodoTask todoTask = (TodoTask) itr1.next();
 
-                            if (todoTask.getId().equalsIgnoreCase(taskId)) {
+                            if (todoTask.getId().equalsIgnoreCase(taskId) && todoTask.getUsers()==u1) {
 
                                 taskDao.delete(todoTask);
                                 response.setStatus(204);
@@ -372,7 +372,7 @@ public class UserController {
 
     @RequestMapping(value = "/tasks/{id}/attachments", method = RequestMethod.POST, produces = "application/json", consumes = "multipart/form-data")
     @ResponseBody
-    public String addAttachments(HttpServletRequest request, HttpServletResponse response, @PathVariable("id") String id, @RequestParam("name") String name,
+    public String addAttachments(HttpServletRequest request, HttpServletResponse response, @PathVariable("id") String id,
                                  @RequestParam("file") MultipartFile file) {
 
 
@@ -407,8 +407,9 @@ public class UserController {
                         if (BCrypt.checkpw(password, u1.getPassword())) {
 
                             try {
+                                System.out.println("id and pass correct");
                                 String taskId = id;
-
+                                boolean flag = false;
                                 Iterable<TodoTask> tasks = taskDao.findAll();
 
                                 Iterator itr1 = tasks.iterator();
@@ -417,13 +418,15 @@ public class UserController {
 
                                     TodoTask todoTask = (TodoTask) itr1.next();
 
-                                    if (todoTask.getId().equalsIgnoreCase(taskId)) {
+
+                                    if (todoTask.getId().equalsIgnoreCase(taskId) && todoTask.getUsers()==u1) {
+
 
                                         String fileName = file.getOriginalFilename();
 
 
                                         byte[] bytes = file.getBytes();
-                                        Path path = Paths.get("//home//riddhi//Desktop//tmpFiles//" + fileName);
+                                        Path path = Paths.get(fileName);
                                         Files.write(path, bytes);
 
                                         TaskAttachments ta = new TaskAttachments();
@@ -437,16 +440,19 @@ public class UserController {
                                         todoTask.setTaskAttachments(tal);
                                         attachmentsDao.save(ta);
 
-
-                                        System.out.println("You successfully uploaded file=" + name);
+                                        flag = true;
+                                        System.out.println("You successfully uploaded file");
                                         response.setStatus(200);
                                         return "Saved";
 
 
-                                    } else
-                                        JsonObject j = new JsonObject();
-                            	        j.addProperty("Error", "ID does not exists");
-                            	        return j.toString();
+
+                                    } //else
+                                    //return "ID does not exists";
+                                }
+                                if (!flag){
+                                    return "ID does not exists";
+
                                 }
 
 
@@ -476,7 +482,7 @@ public class UserController {
                 return j.toString();
             }
         }else {
-            System.out.println("You failed to upload " + name + " because the file was empty.");
+            System.out.println("You failed to upload  because the file was empty.");
 
             JsonObject j = new JsonObject();
             j.addProperty("Error", "File Empty");
@@ -494,7 +500,8 @@ public class UserController {
 
 
     @RequestMapping(value = "/tasks/{id}/attachments/{idAttachments}", method = RequestMethod.DELETE)
-    public String deleteAttachment(@PathVariable("idAttachments") String idAttachments, HttpServletRequest request, HttpServletResponse response) {
+    public String deleteAttachment(@PathVariable("id") long todotaskid,@PathVariable("idAttachments") String idAttachments, HttpServletRequest request, HttpServletResponse response) {
+
 
         final String authorization = request.getHeader("Authorization");
         if (authorization != null && authorization.startsWith("Basic")) {
@@ -524,7 +531,10 @@ public class UserController {
                     if (BCrypt.checkpw(password, u1.getPassword())) {
 
                         try {
-                            String taskId = idAttachments;
+
+                            String attachmentId = idAttachments;
+
+                            TodoTask task=taskDao.findOne(todotaskid);
 
                             Iterable<TaskAttachments> attachments = attachmentsDao.findAll();
 
@@ -534,19 +544,22 @@ public class UserController {
 
                                 TaskAttachments taskAttachments = (TaskAttachments) itr.next();
 
-                                if (taskAttachments.getId().equalsIgnoreCase(taskId)) {
+
+                                if (taskAttachments.getId().equalsIgnoreCase(attachmentId) && taskAttachments.getTodoTask()==task && task.getUsers()==u1) {
+
 
                                     attachmentsDao.delete(taskAttachments);
 
                                     response.setStatus(204);
 
                                     JsonObject j = new JsonObject();
-                                    j.addProperty("Information", "Attachment with  Id: " + taskId + " has been deleted");
+                                    j.addProperty("Information", "Attachment with  Id: " + attachmentId + " has been deleted");
                                     return j.toString();
 
 
 
                                 }
+                                else return "Not Authorized";
                             }
 
 
@@ -637,20 +650,23 @@ public class UserController {
 
                                 TodoTask todoTask = (TodoTask) itr.next();
 
-                                if (todoTask.getId().equalsIgnoreCase(taskId)) {
+                                if (todoTask.getId().equalsIgnoreCase(taskId) && todoTask.getUsers()==u1) {
 
                                     List<TaskAttachments> tal;
 
                                     tal=todoTask.getTaskAttachments();
 
-                                   JsonArray ja = new JsonArray();
+                                    JSONArray ja =new JSONArray();
+                                   //JsonArray ja = new JsonArray();
+
 
                                     for(TaskAttachments ta : tal){
 
                                         JsonObject jo = new JsonObject();
-                                        jo.addProperty("Attachment",ta.toString());
-
+                                        jo.addProperty("AttachmentID",ta.getId());
+                                        jo.addProperty("Path",ta.getPath());
                                     ja.add(jo);
+
 
                                     }
 
@@ -658,9 +674,9 @@ public class UserController {
 
                                     response.setStatus(200);
 
-                                    return ja ;
+                                    return ja.toString() ;
 
-                                }
+                                } else return "unauthorised";
                             }
 
 
@@ -676,7 +692,7 @@ public class UserController {
 
 
 
-                    } catch (Exception e) {
+                        } catch (Exception e) {
                             System.out.println(e.getMessage());
                             response.setStatus(400);
                             return "Bad Request";
