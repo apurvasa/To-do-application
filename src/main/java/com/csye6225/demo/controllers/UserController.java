@@ -224,7 +224,7 @@ public class UserController {
 
                             TodoTask todo = (TodoTask) itr1.next();
 
-                            if (todo.getId().equalsIgnoreCase(taskId)) {
+                            if (todo.getId().equalsIgnoreCase(taskId) && todo.getUsers()==u1) {
 
                                 Long userId = todo.getUsers().getUserId();
 
@@ -324,7 +324,7 @@ public class UserController {
 
                             TodoTask todoTask = (TodoTask) itr1.next();
 
-                            if (todoTask.getId().equalsIgnoreCase(taskId)) {
+                            if (todoTask.getId().equalsIgnoreCase(taskId) && todoTask.getUsers()==u1) {
 
                                 taskDao.delete(todoTask);
                                 response.setStatus(204);
@@ -417,7 +417,7 @@ public class UserController {
 
                                     TodoTask todoTask = (TodoTask) itr1.next();
 
-                                    if (todoTask.getId().equalsIgnoreCase(taskId)) {
+                                    if (todoTask.getId().equalsIgnoreCase(taskId) && todoTask.getUsers()==u1) {
 
                                         String fileName = file.getOriginalFilename();
 
@@ -641,14 +641,14 @@ public class UserController {
                                     List<TaskAttachments> tal;
 
                                     tal=todoTask.getTaskAttachments();
-
-                                   JsonArray ja = new JsonArray();
+                                    JSONArray ja =new JSONArray();
+                                   //JsonArray ja = new JsonArray();
 
                                     for(TaskAttachments ta : tal){
 
                                         JsonObject jo = new JsonObject();
-                                        jo.addProperty("Attachment",ta.toString());
-
+                                        jo.addProperty("AttachmentID",ta.getId());
+                                        jo.addProperty("Path",ta.getPath());
                                     ja.add(jo);
 
                                     }
@@ -657,7 +657,7 @@ public class UserController {
 
                                     response.setStatus(200);
 
-                                    return ja ;
+                                    return ja.toString() ;
 
                                 }
                             }
