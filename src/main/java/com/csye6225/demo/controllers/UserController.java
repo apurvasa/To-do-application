@@ -224,7 +224,7 @@ public class UserController {
 
                             TodoTask todo = (TodoTask) itr1.next();
 
-                            if (todo.getId().equalsIgnoreCase(taskId)) {
+                            if (todo.getId().equalsIgnoreCase(taskId) && todo.getUsers()==u1) {
 
                                 Long userId = todo.getUsers().getUserId();
 
@@ -324,7 +324,7 @@ public class UserController {
 
                             TodoTask todoTask = (TodoTask) itr1.next();
 
-                            if (todoTask.getId().equalsIgnoreCase(taskId)) {
+                            if (todoTask.getId().equalsIgnoreCase(taskId) && todoTask.getUsers()==u1) {
 
                                 taskDao.delete(todoTask);
                                 response.setStatus(204);
@@ -417,8 +417,10 @@ public class UserController {
                                 while (itr1.hasNext()) {
 
                                     TodoTask todoTask = (TodoTask) itr1.next();
-                                    System.out.println("task id: "+todoTask.getId());
-                                    if (todoTask.getId().equalsIgnoreCase(taskId)) {
+
+
+                                    if (todoTask.getId().equalsIgnoreCase(taskId) && todoTask.getUsers()==u1) {
+
 
                                         String fileName = file.getOriginalFilename();
 
@@ -445,7 +447,7 @@ public class UserController {
 
 
                                     } //else
-                                        //return "ID does not exists";
+                                    //return "ID does not exists";
                                 }
                                 if (!flag){
                                     return "ID does not exists";
@@ -652,14 +654,17 @@ public class UserController {
 
                                     tal=todoTask.getTaskAttachments();
 
-                                   JsonArray ja = new JsonArray();
+                                    JSONArray ja =new JSONArray();
+                                   //JsonArray ja = new JsonArray();
+
 
                                     for(TaskAttachments ta : tal){
 
                                         JsonObject jo = new JsonObject();
-                                        jo.addProperty("Attachment",ta.toString());
-
+                                        jo.addProperty("AttachmentID",ta.getId());
+                                        jo.addProperty("Path",ta.getPath());
                                     ja.add(jo);
+
 
                                     }
 
@@ -667,7 +672,7 @@ public class UserController {
 
                                     response.setStatus(200);
 
-                                    return ja ;
+                                    return ja.toString() ;
 
                                 } else return "unauthorised";
                             }
@@ -685,7 +690,7 @@ public class UserController {
 
 
 
-                    } catch (Exception e) {
+                        } catch (Exception e) {
                             System.out.println(e.getMessage());
                             response.setStatus(400);
                             return "Bad Request";
