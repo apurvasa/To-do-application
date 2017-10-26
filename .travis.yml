@@ -26,9 +26,8 @@ before_deploy:
 
 deploy:
  - provider: s3
-   access_key_id: AKIAJHVBBILTLANLCNVQ
-   secret_access_key:
-    secure: dGt9sMdiD8PFYAPr6s/N2cB4QzpCITpuhgunhV2To2sMTcs1GEF2DU7tarDnu2vNTlumSOxrax/DqnVYiAEZObEgBhGI8/qJ5QSB4bXsS9jQGsUaRTZ7CiiT3dTmuxs3/m7Jcr5F+BPVt1SDX07J/qKoa7aKB1SRytdVW7PJ1KAwXvz4btejC4XtStle7DB6h2eeOBLBW4CiQWth/Pp+xBWZDXlYUpRU4vOot2rp18TRja+Extz2DIKyO0ia7tXg130zTnNSPmMXaaidldvZNfiqw9wY41KS4LxrHhoXxeUJW4D2sI1Tix3B5Y9XfPCzirSWv6C5bOYW0kWwVv0P/oV/ardvBscd2QaCoQMyz9V0Yfzhxzeb7x5APueudfOhQdP0p/kI+dHWQyPTu0yLgJh6W2NhTYxctNqybFrRbBClVes84t5uyteCdkmNv/i1NuKGO9biJImD16qIphTAJRFSzfIFjki5/bMCLmMjyEo0S3bBUhVtFMatYVlT6h3j/PxZpTHyptY9Q7DrP1QMzhS4tAH76zkrubjeuWXAZkZBo3JLeT2Q1l7u0fpjWrS9ly1U9V4Ezwy1fFPUYB7qELQe503ae9jCswLSI4OL1RQNu5XY9p1cfGmRcDxa6bJMXwgXIH6fVto1H8XjQuHQYtGBI6uQEXwOZV9EeaHF4GE=
+   access_key_id: $ACCESS_KEY_ID
+   secret_access_key: $SECRET_ACCESS_KEY
    loacl_dir: codedeploy
    bucket: code-deploy.csye6225-fall2017-patelshu.me
    region: us-east-1
