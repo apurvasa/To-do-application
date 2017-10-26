@@ -22,12 +22,15 @@ after_success:
 
 before_deploy:
  - cd ..
+ - rvm 1.9.3 do gem install aws-sdk -v 2.1.36
 
 
 
 
 deploy:
  - provider: s3
+   edge:
+     branch: s3-backward-compat
    access_key_id: AKIAJHVBBILTLANLCNVQ
    secret_access_key:
     secure: N3kmbNYwrC7U6M21/3NJ5/HXct8kbqN7tZeW7ccK13PNIj7lEdD1ogSPFOokbZkEhA/Hon1fIReuViyOxW7Kp3Zb1ZiM3V+TerbYIWALdDjNLg94lPRffD9mGckhaNgP7/ibm3emOW1cnAbYfo0kt9Pv0kqsKm66FRNhDIe8Pe/Zoffdh+rRir3exQ9t7lUKhrlzeOy/B6zQInpjxKl+wswKpKvtgneVuUfuj4e0UxhMDGQNo6zavtetwyCZSW8fvDC102dgDexP9INSAtm8BKI7Vy4bC4gYboBcR79zg0KtASXCjxfszOpTKTcXkqLtGRkTUnC19BRsrNHV1QSHJU9HllfjNpTPRgK8nJYVv23R726ZP44/Uzq0w+pJpo4+nZBe6cxhpmy3I8avXZS9vLIzRjOGK9st+k0ZZaR5HOiAKP4KumXe13s7GQS+Xg73qNhs/N6imL8CiHaRln+PUG/XMLpcuBMTAxd5oIOdQnIl5VAT4Z+bymJigZ4upfq6L5Gobp2JSl/R+fknXBMzoik+5f8xxkRZdIEsTeWeAVNsVXPtWPwJg5wTxv4bnjGQRNAAGgahbOtbF/Wh5ejh55+3MeIig+2EDjAyJdlIffGnDjcaYnORh7dPpCm8t3yPdHVGOmJu+XMxMVUlyfrwHPEurIky/HyrFL5EG4lrdvk=
