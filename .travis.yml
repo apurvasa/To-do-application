@@ -22,9 +22,6 @@ after_success:
 
 before_deploy:
  - cd ..
- - rvm 1.9.3 do gem install aws-sdk -v 2.1.36
-
-
 
 
 deploy:
