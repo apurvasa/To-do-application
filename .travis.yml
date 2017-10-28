@@ -36,7 +36,7 @@ deploy:
  - provider: codedeploy
    access_key_id: $ACCESS_KEY_ID
    bucket: code-deploy.csye6225-fall2017-patelshu.me
-   key: SimpleJavaProject-${TRAVIS_JOB_NUMBER}.zip
+   key: JavaProject-${TRAVIS_JOB_NUMBER}.zip
    bundle_type: zip
    application: csye6225
    deployment_group: csye6225
