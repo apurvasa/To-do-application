@@ -66,7 +66,11 @@ public class UserController {
 
             if (user.getEmail().equalsIgnoreCase(email)) {
 
-                return "User already exist!!!";
+                JsonObject j = new JsonObject();
+                j.addProperty("Message", "User already exist!!!");
+
+                return jo;
+
             }
 
 
@@ -276,9 +280,10 @@ public class UserController {
             JsonObject j = new JsonObject();
             j.addProperty("Error", "Unauthorized User: You Are Not Logged In");
 
+            return j.toString();
         }
 
-        return null;
+
     }
 
     @RequestMapping(value = "/tasks/{id}", method = RequestMethod.DELETE)
@@ -363,9 +368,10 @@ public class UserController {
             JsonObject j = new JsonObject();
             j.addProperty("Error", "Unauthorized User: You Are Not Logged In");
 
+            return j.toString();
         }
 
-        return null;
+
     }
 
 
@@ -443,15 +449,20 @@ public class UserController {
                                         flag = true;
                                         System.out.println("You successfully uploaded file");
                                         response.setStatus(200);
-                                        return "Saved";
+                                        JsonObject j = new JsonObject();
+                                        j.addProperty("Information", "Saved");
+                                        return j.toString();
 
 
 
-                                    } //else
-                                    //return "ID does not exists";
+
+                                    }
                                 }
                                 if (!flag){
-                                    return "ID does not exists";
+                                    JsonObject j = new JsonObject();
+                                    j.addProperty("Error", "ID does not exists");
+                                    return j.toString();
+
 
                                 }
 
@@ -459,7 +470,10 @@ public class UserController {
                             } catch (Exception e) {
                                 System.out.println(e.getMessage());
                                 response.setStatus(400);
-                                return "Bad Request";
+                                JsonObject j = new JsonObject();
+                                j.addProperty("Error", "Bad Request");
+                                return j.toString();
+
                             }
                         }else {
 
@@ -473,14 +487,15 @@ public class UserController {
 
                 JsonObject j = new JsonObject();
                 j.addProperty("Error", "User With Given Email " + email + " Doest Exist!!!");
-
                 return j.toString();
+
             } else {
 
                 JsonObject j = new JsonObject();
                 j.addProperty("Error", "Unauthorized User: You Are Not Logged In");
                 return j.toString();
             }
+
         }else {
             System.out.println("You failed to upload  because the file was empty.");
 
@@ -559,7 +574,6 @@ public class UserController {
 
 
                                 }
-                                else return "Not Authorized";
                             }
 
 
@@ -576,7 +590,10 @@ public class UserController {
                         } catch (Exception e) {
                             System.out.println(e.getMessage());
                             response.setStatus(400);
-                            return "Bad Request";
+                            JsonObject j = new JsonObject();
+                            j.addProperty("Error", "Bad Request");
+                            return j.toString();
+
                         }
                     }else {
 
@@ -676,7 +693,7 @@ public class UserController {
 
                                     return ja.toString() ;
 
-                                } else return "unauthorised";
+                                }
                             }
 
 
