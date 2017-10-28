@@ -1,0 +1,9 @@
+version: 0.0
+os: linux
+
+files:
+  - source: ./appspec.yml
+    destination: /home/ubuntu
+  - source: ./build/libs/test-1.0.0.war
+    destination: /var/lib/tomcat8/webapps
+

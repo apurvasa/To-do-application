@@ -500,7 +500,7 @@ public class UserController {
 
 
     @RequestMapping(value = "/tasks/{id}/attachments/{idAttachments}", method = RequestMethod.DELETE)
-    public String deleteAttachment(@PathVariable("id") long todotaskid,@PathVariable("idAttachments") String idAttachments, HttpServletRequest request, HttpServletResponse response) {
+    public String deleteAttachment(@PathVariable("id") String todotaskid,@PathVariable("idAttachments") String idAttachments, HttpServletRequest request, HttpServletResponse response) {
 
 
         final String authorization = request.getHeader("Authorization");
@@ -534,33 +534,29 @@ public class UserController {
 
                             String attachmentId = idAttachments;
 
-                            TodoTask task=taskDao.findOne(todotaskid);
+                            Iterable<TodoTask> tasks = taskDao.findAll();
 
-                            Iterable<TaskAttachments> attachments = attachmentsDao.findAll();
+                            Iterator itr2 = tasks.iterator();
 
-                            Iterator itr = attachments.iterator();
+                            while (itr2.hasNext()) {
 
-                            while (itr.hasNext()) {
-
-                                TaskAttachments taskAttachments = (TaskAttachments) itr.next();
+                                TodoTask todoTask = (TodoTask) itr2.next();
 
 
-                                if (taskAttachments.getId().equalsIgnoreCase(attachmentId) && taskAttachments.getTodoTask()==task && task.getUsers()==u1) {
-
-
-                                    attachmentsDao.delete(taskAttachments);
-
-                                    response.setStatus(204);
-
-                                    JsonObject j = new JsonObject();
-                                    j.addProperty("Information", "Attachment with  Id: " + attachmentId + " has been deleted");
-                                    return j.toString();
+                                if (todoTask.getId().equalsIgnoreCase(todotaskid) && todoTask.getUsers()==u1) {
 
 
 
-                                }
-                                else return "Not Authorized";
+                                    System.out.println("You successfully deleted file");
+                                    response.setStatus(200);
+                                    return "deleted";
+
+
+
+                                } //else
+                                //return "ID does not exists";
                             }
+                         
 
 
 
@@ -676,7 +672,7 @@ public class UserController {
 
                                     return ja.toString() ;
 
-                                } else return "unauthorised";
+                                }
                             }
 
 
