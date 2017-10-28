@@ -10,7 +10,7 @@ script:
 
 after_success:
  - mkdir codedeploy
- - zip -r TestJavaProject-${TRAVIS_JOB_NUMBER}.zip build/libs/ROOT.war appspec.yml
+ - zip -r TestJavaProject-${TRAVIS_JOB_NUMBER}.zip build/libs/ROOT.war appspec.yml restartTomcat.sh
  - ls -al
  - mv TestJavaProject-${TRAVIS_JOB_NUMBER}.zip codedeploy/
  - ls -al
@@ -33,6 +33,16 @@ deploy:
    region: us-east-1
    skip_cleanup: true
    all_branches: true
+ - provider: codedeploy
+   access_key_id: $ACCESS_KEY_ID
+   bucket: code-deploy.csye6225-fall2017-patelshu.me
+   key: SimpleJavaProject-${TRAVIS_JOB_NUMBER}.zip
+   bundle_type: zip
+   application: csye6225
+   deployment_group: csye6225
+   region: us-east-1
+   secret_access_key: $SECRET_ACCESS_KEY
+   wait-until-deployed: true
 
 notifications:
   email:
