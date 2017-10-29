@@ -50,7 +50,6 @@ deploy:
    wait-until-deployed: true
 
 
-
 notifications:
   email:
     recipients:
