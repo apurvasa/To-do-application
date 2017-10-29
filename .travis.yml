@@ -25,7 +25,6 @@ before_deploy:
 
 
 
-
 deploy:
  - provider: s3
    access_key_id: AKIAILJNNSYHRZPOQLNA
