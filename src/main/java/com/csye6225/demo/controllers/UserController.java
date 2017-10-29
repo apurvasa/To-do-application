@@ -27,7 +27,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.charset.Charset;
 import java.util.*;
-
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.S3ObjectSummary;
 
 @RestController
 public class UserController {
@@ -368,12 +374,32 @@ public class UserController {
         return null;
     }
 
-
+    public static void createFolder(String bucketName, String folderName, AmazonS3 client) {
+        // create meta-data for your folder and set content-length to 0
+        System.out.println("entered in fn");
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentLength(0);
+        // create empty content
+        InputStream emptyContent = new ByteArrayInputStream(new byte[0]);
+        // create a PutObjectRequest passing the folder name suffixed by /
+        System.out.println("inputstream created");
+        PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName,
+                folderName, emptyContent, metadata);
+        // send request to S3 to create folder
+        System.out.println("send request to s3");
+        client.putObject(putObjectRequest);
+        System.out.println("put object");
+    }
 
     @RequestMapping(value = "/tasks/{id}/attachments", method = RequestMethod.POST, produces = "application/json", consumes = "multipart/form-data")
     @ResponseBody
     public String addAttachments(HttpServletRequest request, HttpServletResponse response, @PathVariable("id") String id,
                                  @RequestParam("file") MultipartFile file) {
+
+        AWSCredentials s3credentials = new BasicAWSCredentials("AKIAJ23IXTRAFUN2XXJA", "sZV9iQAZHjo4SF+ii58g9JY59vaSBdviy39YjYMD");
+        AmazonS3 s3client = new AmazonS3Client(s3credentials);
+
+        String bucketName = "code-deploy.csye6225-fall2017-sawantap.me.com";
 
 
         if (!file.isEmpty()) {
@@ -419,12 +445,17 @@ public class UserController {
                                     TodoTask todoTask = (TodoTask) itr1.next();
                                     System.out.println("task id: "+todoTask.getId());
                                     if (todoTask.getId().equalsIgnoreCase(taskId)) {
-
+                                        //create folder on s3 bucket
+                                        createFolder(bucketName, taskId, s3client);
                                         String fileName = file.getOriginalFilename();
+                                        Path path = Paths.get(fileName);
 
+                                      //  String fileName = folderName + SUFFIX + "testvideo.mp4";
+                                        s3client.putObject(new PutObjectRequest(bucketName, fileName,
+                                                new File(path+fileName+".txt")));
 
                                         byte[] bytes = file.getBytes();
-                                        Path path = Paths.get(fileName);
+
                                         Files.write(path, bytes);
 
                                         TaskAttachments ta = new TaskAttachments();
