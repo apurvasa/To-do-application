@@ -445,7 +445,7 @@ public class UserController {
                                 while (itr1.hasNext()) {
 
                                     TodoTask todoTask = (TodoTask) itr1.next();
-                                    System.out.println("task id: "+todoTask.getId());
+                                  //  System.out.println("task id: "+todoTask.getId());
                                     if (todoTask.getId().equalsIgnoreCase(taskId)) {
                                         //create folder on s3 bucket
                                       //  createFolder(bucketName, taskId, s3client);
