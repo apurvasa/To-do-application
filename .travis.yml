@@ -44,7 +44,7 @@ deploy:
    key: SimpleTestJAVA-${TRAVIS_JOB_NUMBER}.zip
    bundle_type: zip
    application: SimpleTestJAVA
-   deployment_group: SimpleTestJAVA
+   deployment_group: CSYE6225
    region: us-east-1
    wait-until-deployed: true
 
