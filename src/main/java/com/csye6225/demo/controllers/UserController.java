@@ -1,5 +1,9 @@
 package com.csye6225.demo.controllers;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.Bucket;
+import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.csye6225.demo.bean.S3Client;
 import com.csye6225.demo.bean.TaskAttachments;
 import com.csye6225.demo.bean.TodoTask;
 import com.csye6225.demo.bean.User;
@@ -42,9 +46,35 @@ public class UserController {
     @Autowired
     private TaskDao taskDao;
 
-
     @Autowired
     private AttachmentsDao attachmentsDao;
+
+    @Autowired
+    S3Client s3Client;
+
+    HttpServletRequest request;
+    HttpServletResponse response;
+
+    @RequestMapping(value = "/test", method = RequestMethod.GET, produces = "application/json")
+    public Object test() {
+
+        AmazonS3 s3client = s3Client.getS3Client();
+
+   //     List<Bucket> buckets = s3client.listBuckets();
+
+        String bucketName = "code-deploy.csye6225-fall2017-patelshu.me";
+
+        String fileName = "access.log";
+        Path p = Paths.get(fileName);
+
+        s3client.putObject(new PutObjectRequest(bucketName, fileName,
+                new File("")));
+
+
+
+
+        return null;
+    }
 
     @RequestMapping(value = "/user/register", method = RequestMethod.POST)
     public Object register(@RequestBody JSONObject jo) {
