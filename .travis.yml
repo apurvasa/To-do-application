@@ -43,8 +43,8 @@ deploy:
    bucket: code-deploy.csye6225-fall2017-chabhadiar.me
    key: SimpleTestJAVA-${TRAVIS_JOB_NUMBER}.zip
    bundle_type: zip
-   application: TestJavaProject
-   deployment_group: TestJavaProject
+   application: SimpleTestJAVA
+   deployment_group: SimpleTestJAVA
    region: us-east-1
    wait-until-deployed: true
 
