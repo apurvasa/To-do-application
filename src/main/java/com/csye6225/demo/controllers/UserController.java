@@ -451,7 +451,10 @@ public class UserController {
 
                                         String folderToPut = folderName + SUFFIX + fileName;
 
-                                        s3client.putObject(new PutObjectRequest(bucketName, folderToPut, new File(fileName)));
+                                        File f= new File(fileName);
+                                        file.transferTo(f);
+
+                                        s3client.putObject(new PutObjectRequest(bucketName, folderToPut, f));
 
 
 
