@@ -577,12 +577,21 @@ public class UserController {
 
                                   //  s3client.deleteObject(bucketName, fileName);
 
-                                    attachmentsDao.delete(taskAttachments);
 
+boolean flag1=false;
+                                TaskAttachments tobedeletd=null;
 
-                                if (todoTask.getId().equalsIgnoreCase(todotaskid) && todoTask.getUsers()==u1) {
+                                if (todoTask.getId().equalsIgnoreCase(todotaskid) && todoTask.getUsers()==u1 ) {
+                                   List<TaskAttachments> attachlist=new ArrayList<TaskAttachments>();
+for(TaskAttachments att: attachlist){
+    if(att.getId().equalsIgnoreCase(attachmentId)){
 
-
+        flag1=true;
+         tobedeletd=att;
+    }
+}if(flag1){
+    attachmentsDao.delete(tobedeletd);
+                                    }
 
                                     System.out.println("You successfully deleted file");
                                     response.setStatus(200);
