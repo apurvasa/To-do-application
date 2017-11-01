@@ -32,13 +32,13 @@ deploy:
    all_branches: true
  - provider: codedeploy
    access_key_id: $ACCESS_ID
-   secret_access_key: $ACCESS_KEY
    bucket: code-deploy.csye6225-fall2017-sawantap.me.com
    key: csye6225-${TRAVIS_JOB_NUMBER}.zip
    bundle_type: zip
    application: csye6225
    deployment_group: csye6225
    region: us-east-1
+   secret_access_key: $ACCESS_KEY
    wait-until-deployed: true
 
 notifications:
