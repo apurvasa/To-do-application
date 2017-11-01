@@ -383,7 +383,6 @@ public class UserController {
 
 
     @RequestMapping(value = "/tasks/{id}/attachments", method = RequestMethod.POST, produces = "application/json", consumes = "multipart/form-data")
-    @ResponseBody
     public String addAttachments(HttpServletRequest request, HttpServletResponse response, @PathVariable("id") String id,
                                  @RequestParam("file") MultipartFile file) {
 
@@ -489,7 +488,7 @@ public class UserController {
 
 
                             } catch (Exception e) {
-                                System.out.println(e.getMessage());
+                                System.out.println(e);
                                 response.setStatus(400);
                                 JsonObject j = new JsonObject();
                                 j.addProperty("Error", "Bad Request");
