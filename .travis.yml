@@ -38,10 +38,10 @@ deploy:
    bucket: code-deploy.csye6225-fall2017-sawantap.me.com
    key: csye6225-${TRAVIS_JOB_NUMBER}.zip
    bundle_type: zip
-   application: code-deploy.csye6225.com
-   deployment_group: code-deploy.csye6225.com
+   application: csye6225
+   deployment_group: csye6225
    region: us-east-1
-wait-until-deployed: true
+   wait-until-deployed: true
 
 notifications:
   email:
