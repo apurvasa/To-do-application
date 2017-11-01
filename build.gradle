@@ -10,6 +10,7 @@ buildscript {
     }
 }
 
+
 apply plugin: 'java'
 apply plugin: 'eclipse-wtp'
 apply plugin: 'org.springframework.boot'
@@ -79,7 +80,8 @@ dependencies {
 
     compile group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
     compile 'io.rest-assured:json-path:3.0.3'
-
+    compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.6'
+    compile 'com.amazonaws:aws-java-sdk:+'
 
     runtime('org.springframework.boot:spring-boot-devtools')
     runtime('mysql:mysql-connector-java')
