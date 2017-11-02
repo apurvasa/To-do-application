@@ -11,7 +11,7 @@ public class S3Client {
 
     public AmazonS3 getS3Client(){
 
-     AWSCredentials credentials = new BasicAWSCredentials("AKIAJHVBBILTLANLCNVQ", "mfnb/gFl/tSpmqGu1Hc03Wj3ncV1eVvCtw6XaTtI");
+     AWSCredentials credentials = new BasicAWSCredentials("$ACCESS_ID", "mfnb/gFl/tSpmqGu1Hc03Wj3ncV1eVvCtw6XaTtI");
 
         AmazonS3 s3client = new AmazonS3Client(credentials);
 

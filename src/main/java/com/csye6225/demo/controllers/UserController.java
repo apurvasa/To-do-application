@@ -538,7 +538,7 @@ public class UserController {
 
 
     @RequestMapping(value = "/tasks/{id}/attachments/{idAttachments}", method = RequestMethod.DELETE)
-    public String deleteAttachment(@PathVariable("id") long todotaskid,@PathVariable("idAttachments") String idAttachments, HttpServletRequest request, HttpServletResponse response) {
+    public String deleteAttachment(@PathVariable("id") String todotaskid,@PathVariable("idAttachments") String idAttachments, HttpServletRequest request, HttpServletResponse response) {
 
 
         final String authorization = request.getHeader("Authorization");
@@ -572,42 +572,48 @@ public class UserController {
 
                             String attachmentId = idAttachments;
 
-                            TodoTask task=taskDao.findOne(todotaskid);
+                            Iterable<TodoTask> tasks = taskDao.findAll();
 
-                            Iterable<TaskAttachments> attachments = attachmentsDao.findAll();
+                            Iterator itr2 = tasks.iterator();
 
-                            Iterator itr = attachments.iterator();
+                            while (itr2.hasNext()) {
 
-                            while (itr.hasNext()) {
-
-                                TaskAttachments taskAttachments = (TaskAttachments) itr.next();
+                                TodoTask todoTask = (TodoTask) itr2.next();
 
 
-                                if (taskAttachments.getId().equalsIgnoreCase(attachmentId) && taskAttachments.getTodoTask()==task && task.getUsers()==u1) {
+                                //  s3client.deleteObject(bucketName, fileName);
 
 
-                                    attachmentsDao.delete(taskAttachments);
+                                boolean flag1 = false;
+                                //TaskAttachments tobedeletd = null;
 
-                                    response.setStatus(204);
+                                if (todoTask.getId().equalsIgnoreCase(todotaskid) && todoTask.getUsers() == u1) {
+                                    List<TaskAttachments> attachlist = todoTask.getTaskAttachments();
+
+                                    for (TaskAttachments att : attachlist) {
+                                        if (att.getId().equalsIgnoreCase(attachmentId)) {
+
+                                            flag1 = true;
+                                            attachmentsDao.delete(att);
+
+                                        }
+                                    }
+                                    if (!flag1) {
+                                        JsonObject j = new JsonObject();
+                                        j.addProperty("Error", "ID does not exists");
+                                        return j.toString();
+                                    }
+
+
+                                    response.setStatus(400);
 
                                     JsonObject j = new JsonObject();
-                                    j.addProperty("Information", "Attachment with  Id: " + attachmentId + " has been deleted");
+                                    j.addProperty("Error", "Given Task Id doesn't exists");
                                     return j.toString();
-
 
 
                                 }
                             }
-
-
-
-                            response.setStatus(400);
-
-                            JsonObject j = new JsonObject();
-                            j.addProperty("Error", "Given Task Id doesn't exists");
-                            return j.toString();
-
-
 
 
                         } catch (Exception e) {
