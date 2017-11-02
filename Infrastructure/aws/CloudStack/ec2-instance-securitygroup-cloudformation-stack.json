@@ -188,6 +188,12 @@
 						"FromPort":"443",
 						"ToPort":"443",
 						"CidrIp":"0.0.0.0/0"
+					},
+					{
+						"IpProtocol":"tcp",
+						"FromPort":"3306",
+						"ToPort":"3306",
+						"CidrIp":"0.0.0.0/0"
 					}
 				]
 			}
@@ -293,7 +299,7 @@
 					"Principal":
 					{ "Service": [ "ec2.amazonaws.com" ] },
 					"Action": [ "sts:AssumeRole" ] } ] },
-				"ManagedPolicyArns": [{"Ref": "CreateCodeDeployEC2Ploicy"}],
+				"ManagedPolicyArns": [{"Ref": "CreateCodeDeployEC2Ploicy"},"arn:aws:iam::aws:policy/AmazonS3FullAccess","arn:aws:iam::aws:policy/AWSConnector"],
 				"RoleName":{"Ref":"CodeDepEc2ServiceRole"} } },
 
 		"CodeDeployServiceRole":{
@@ -336,6 +342,7 @@
 					"Ref": "EngineVersion"
 				},
 				"MultiAZ": "false",
+				"PubliclyAccessible" : "true",
 				"DBInstanceIdentifier": {
 					"Ref": "DBInstanceIdentifier"
 				},
