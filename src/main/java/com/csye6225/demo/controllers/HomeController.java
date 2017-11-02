@@ -1,6 +1,8 @@
 package com.csye6225.demo.controllers;
 
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.csye6225.demo.bean.S3Client;
 import com.csye6225.demo.bean.User;
 import com.csye6225.demo.dao.UserDao;
 
@@ -10,6 +12,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Controller;
+
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.Bucket;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.S3ObjectSummary;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -55,75 +67,76 @@ public class HomeController {
 
     @Autowired
     private UserDao userDao;
+    @Autowired
+    S3Client s3Client;
 
-  private final static Logger logger = LoggerFactory.getLogger(HomeController.class);
+    private final static Logger logger = LoggerFactory.getLogger(HomeController.class);
 
- @RequestMapping(value = "/", method = RequestMethod.GET, produces = "application/json")
-  @ResponseBody
-  public Object welcome(HttpServletRequest request) {
-
-
-
-   final String authorization = request.getHeader("Authorization");
-   if (authorization != null && authorization.startsWith("Basic")) {
-
-       String base64Credentials = authorization.substring("Basic".length()).trim();
-       String credentials = new String(Base64.getDecoder().decode(base64Credentials),
-               Charset.forName("UTF-8"));
-
-       final String[] values = credentials.split(":", 2);
-
-       String email = values[0];
-       String password = values[1];
-
-       System.out.println(email);
-       System.out.println(password);
-
-       Iterable<User> lu = userDao.findAll();
-
-       Iterator itr = lu.iterator();
-       do{
-
-           User u1 = (User)itr.next();
-
-           if(u1.getEmail().equalsIgnoreCase(email)){
-
-               if(BCrypt.checkpw(password, u1.getPassword())){
+    @RequestMapping(value = "/", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    public Object welcome(HttpServletRequest request) {
 
 
-                   JsonObject jo = new JsonObject();
-                   jo.addProperty("Login ", "Welcome "+u1.getUserName()+" You Are Logged In");
-                   jo.addProperty("Current Time ",""+ new Date().toString());
+        final String authorization = request.getHeader("Authorization");
+        if (authorization != null && authorization.startsWith("Basic")) {
 
-                   System.out.println(jo.toString());
+            String base64Credentials = authorization.substring("Basic".length()).trim();
+            String credentials = new String(Base64.getDecoder().decode(base64Credentials),
+                    Charset.forName("UTF-8"));
 
-                   return jo.toString();
+            final String[] values = credentials.split(":", 2);
 
+            String email = values[0];
+            String password = values[1];
 
-               }else{
+            System.out.println(email);
+            System.out.println(password);
 
-                   JsonObject j = new JsonObject();
-                   j.addProperty("Error","Password Doesn't Match");
-                   return j.toString();
-               }
-           }
+            Iterable<User> lu = userDao.findAll();
 
-       }
-       while(itr.hasNext());
+            Iterator itr = lu.iterator();
+            do {
 
-       JsonObject j = new JsonObject();
-       j.addProperty("Error","User With Given Email "+email+" Doest Exist!!!");
+                User u1 = (User) itr.next();
 
-       return j.toString();
+                if (u1.getEmail().equalsIgnoreCase(email)) {
 
-   }else{
-
-       JsonObject j = new JsonObject();
-       j.addProperty("Error","Unauthorized User: You Are Not Logged In");
+                    if (BCrypt.checkpw(password, u1.getPassword())) {
 
 
-       return j.toString();
-   }
+                        JsonObject jo = new JsonObject();
+                        jo.addProperty("Login ", "Welcome " + u1.getUserName() + " You Are Logged In");
+                        jo.addProperty("Current Time ", "" + new Date().toString());
+
+                        System.out.println(jo.toString());
+
+                        return jo.toString();
+
+
+                    } else {
+
+                        JsonObject j = new JsonObject();
+                        j.addProperty("Error", "Password Doesn't Match");
+                        return j.toString();
+                    }
+                }
+
+            }
+            while (itr.hasNext());
+
+            JsonObject j = new JsonObject();
+            j.addProperty("Error", "User With Given Email " + email + " Doest Exist!!!");
+
+            return j.toString();
+
+        } else {
+
+            JsonObject j = new JsonObject();
+            j.addProperty("Error", "Unauthorized User: You Are Not Logged In");
+
+
+            return j.toString();
+        }
 
 
 
@@ -133,6 +146,7 @@ public class HomeController {
     jsonObject.addProperty("To Login Go To", "/user/login/{email}/{password}");
     jsonObject.addProperty("To Logout Go To", "/user/logout");
     return jsonObject.toString();*/
-  }
+    }
+
 
 }
