@@ -11,7 +11,7 @@ script:
 
 after_success:
  - mkdir codedeploy
- - zip -r csye6225.zip build/libs/ROOT.war appspec.yml restartTomcat.sh
+ - zip -r csye6225.zip build/libs/ROOT.war appspec.yml restart.sh
  - ls -al
  - mv csye6225.zip codedeploy/
  - ls -al
@@ -48,11 +48,9 @@ deploy:
    on :
     all_branches: true
 
-
 notifications:
   email:
     recipients:
     - patel.shu@husky.neu.edu
     - sawant.ap@husky.neu.edu
     - chabhadia.r@husky.neu.edu
-
