@@ -101,33 +101,42 @@
 						]
 					}
 				],
-				"UserData":{
-					"Fn::Base64":{
-						"Fn::Join":[
-							"",
-							[
-								"#!/bin/bash -xe\n",
-								"sudo apt-get update -y\n",
-								"sudo apt install -y alien\n",
-								"sudo wget --no-cookies --no-check-certificate --header 'Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie' 'http://download.oracle.com/otn-pub/java/jdk/8u151-b12/e758a0de34e24606bca991d704f6dcbf/jdk-8u151-linux-x64.rpm'\n",
-								"sudo alien -c jdk-8u151-linux-x64.rpm\n",
-								"sudo dpkg --install jdk1.8_1.8.0151-1_amd64.deb\n",
-								"echo java -version\n",
-								"sudo apt-get update -y\n",
-								"sudo apt-get -y install tomcat8\n",
-								"sudo service tomcat8 start\n",
-								"sudo apt-get update\n",
-								"sudo apt-get install -y ruby\n",
-								"cd /home/ubuntu\n",
-								"wget https://aws-codedeploy-us-east-1.s3.amazonaws.com/latest/install\n",
-								"chmod +x ./install\n",
-								"sudo ./install auto\n",
-								"sudo service codedeploy-agent status\n",
-								"sudo service codedeploy-agent start\n",
-								"sudo service codedeploy-agent status\n"
-							]
-						]
-					}
+				"UserData": { "Fn::Base64" : { "Fn::Join" : ["", [
+					"#!/bin/bash\n",
+					"sudo apt-get update\n",
+					"sudo apt-get install openjdk-8-jdk -y\n",
+					"sudo apt-get install tomcat8 -y\n",
+					"sudo service tomcat8 start\n",
+					"sudo apt-get update\n",
+					"sudo apt-get install ruby -y\n",
+					"sudo apt-get install wget\n",
+					"cd /home/ubuntu\n",
+					"wget https://aws-codedeploy-us-east-1.s3.amazonaws.com/latest/install\n",
+					"chmod +x ./install\n",
+					"sudo ./install auto\n",
+					"sudo service codedeploy-agent start\n",
+					"sudo service codedeploy-agent status\n",
+					"echo '#!/bin/sh' >> /usr/share/tomcat8/bin/setenv.sh \n",
+					{
+						"Fn::Sub": "echo 'JAVA_OPTS=\"$JAVA_OPTS -Dspring.datasource.url=jdbc:mysql://${RDSInstance.Endpoint.Address}:3306/csye6225\"' >> /usr/share/tomcat8/bin/setenv.sh\n"
+					},
+					{
+						"Fn::Sub": "echo 'JAVA_OPTS=\"$JAVA_OPTS -Dspring.datasource.username=${DBUser}\"' >> /usr/share/tomcat8/bin/setenv.sh\n"
+					},
+					{
+						"Fn::Sub": "echo 'JAVA_OPTS=\"$JAVA_OPTS -Dspring.datasource.password=${DBPassword}\"' >> /usr/share/tomcat8/bin/setenv.sh\n"
+					},
+					{
+						"Fn::Sub": "echo 'JAVA_OPTS=\"$JAVA_OPTS -Dbucket.name=${S3BucketName}\"' >> /usr/share/tomcat8/bin/setenv.sh\n"
+					},
+					"chmod +x /usr/share/tomcat8/bin/setenv.sh\n",
+					"chown tomcat8:tomcat8 /usr/share/tomcat8/bin/setenv.sh\n",
+					"chmod 777 -R /tmp\n",
+					"chmod 777 /var/lib/tomcat8\n",
+					"chmod 777 /var/lib/tomcat8/webapps"
+				]
+				]
+				}
 				},
 				"KeyName":{
 					"Ref":"KeyName"
