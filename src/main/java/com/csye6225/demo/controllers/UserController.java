@@ -1,5 +1,6 @@
 package com.csye6225.demo.controllers;
 
+
 import com.amazonaws.auth.InstanceProfileCredentialsProvider;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
@@ -14,14 +15,19 @@ import com.csye6225.demo.dao.TaskDao;
 import com.csye6225.demo.dao.UserDao;
 import com.csye6225.demo.services.GenerateUUID;
 import com.google.gson.*;
+import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -49,17 +55,9 @@ public class UserController {
     @Autowired
     private TaskDao taskDao;
 
+
     @Autowired
     private AttachmentsDao attachmentsDao;
-
-    @Autowired
-    S3Client s3Client;
-
-    HttpServletRequest request;
-    HttpServletResponse response;
-
-    private static final String SUFFIX = "/";
-
 
 
             AmazonS3 s3client= AmazonS3ClientBuilder.standard().withCredentials(new InstanceProfileCredentialsProvider(false)).build();
@@ -89,11 +87,7 @@ public class UserController {
 
             if (user.getEmail().equalsIgnoreCase(email)) {
 
-                JsonObject j = new JsonObject();
-                j.addProperty("Message", "User already exist!!!");
-
-                return jo;
-
+                return "User already exist!!!";
             }
 
 
@@ -205,6 +199,7 @@ public class UserController {
         }
 
 
+
         return null;
     }
 
@@ -250,7 +245,7 @@ public class UserController {
 
                             TodoTask todo = (TodoTask) itr1.next();
 
-                            if (todo.getId().equalsIgnoreCase(taskId) && todo.getUsers() == u1) {
+                            if (todo.getId().equalsIgnoreCase(taskId) && todo.getUsers()==u1) {
 
                                 Long userId = todo.getUsers().getUserId();
 
@@ -283,7 +278,7 @@ public class UserController {
                         return j.toString();
 
 
-                    } else {
+                    }else {
 
                         JsonObject j = new JsonObject();
                         j.addProperty("Error", "Password Doesn't Match");
@@ -302,10 +297,9 @@ public class UserController {
             JsonObject j = new JsonObject();
             j.addProperty("Error", "Unauthorized User: You Are Not Logged In");
 
-            return j.toString();
         }
 
-
+        return null;
     }
 
     @RequestMapping(value = "/tasks/{id}", method = RequestMethod.DELETE)
@@ -340,6 +334,7 @@ public class UserController {
                     if (BCrypt.checkpw(password, u1.getPassword())) {
 
 
+
                         String taskId = id;
 
                         Iterable<TodoTask> tasks = taskDao.findAll();
@@ -350,13 +345,13 @@ public class UserController {
 
                             TodoTask todoTask = (TodoTask) itr1.next();
 
-                            if (todoTask.getId().equalsIgnoreCase(taskId) && todoTask.getUsers() == u1) {
+                            if (todoTask.getId().equalsIgnoreCase(taskId) && todoTask.getUsers()==u1) {
 
                                 taskDao.delete(todoTask);
                                 response.setStatus(204);
 
                                 JsonObject j = new JsonObject();
-                                j.addProperty("Information", "Task Id: " + taskId + " has been deleted");
+                                j.addProperty("Information", "Task Id: " +taskId+ " has been deleted");
                                 return j.toString();
 
 
@@ -370,7 +365,7 @@ public class UserController {
                         return j.toString();
 
 
-                    } else {
+                    }else {
 
                         JsonObject j = new JsonObject();
                         j.addProperty("Error", "Password Doesn't Match");
@@ -389,11 +384,11 @@ public class UserController {
             JsonObject j = new JsonObject();
             j.addProperty("Error", "Unauthorized User: You Are Not Logged In");
 
-            return j.toString();
         }
 
-
+        return null;
     }
+
 
 
 
@@ -427,11 +422,14 @@ public class UserController {
 
         s3client.putObject(new PutObjectRequest(bucketName,newFile.getName(),newFile));
 
+
+    
     }
 
 
 
     @RequestMapping(value = "/tasks/{id}/attachments", method = RequestMethod.POST, produces = "application/json", consumes = "multipart/form-data")
+    @ResponseBody
     public String addAttachments(HttpServletRequest request, HttpServletResponse response, @PathVariable("id") String id,
                                  @RequestParam("file") MultipartFile file) {
 
@@ -480,16 +478,17 @@ public class UserController {
 
                                     TodoTask todoTask = (TodoTask) itr1.next();
 
-                                    System.out.println("task id: " + todoTask.getId());
+                                    System.out.println("task id: "+todoTask.getId());
                                     if (todoTask.getId().equalsIgnoreCase(taskId)) {
                                         //create folder on s3 bucket
-                                        //  createFolder(bucketName, taskId, s3client);
+                                      //  createFolder(bucketName, taskId, s3client);
 
                                         String fileName = file.getOriginalFilename();
                                         Path path = Paths.get(fileName);
                                         byte[] bytes = file.getBytes();
 
                                         Files.write(path, bytes);
+
 
 //                                        //  String fileName = folderName + SUFFIX + "testvideo.mp4";
 //                                        s3client.putObject(new PutObjectRequest(bucketName, fileName, new File(fileName)));
@@ -513,27 +512,9 @@ public class UserController {
 
                                         String buc=System.getProperty("bucket.name");
                                         createFolder(buc, file);
+
                                         //  String fileName = folderName + SUFFIX + "testvideo.mp4";
                                         // s3client.putObject(new PutObjectRequest(bucketName, fileName, new File(fileName)));
-
-                                        // AmazonS3 s3client = s3Client.getS3Client();
-
-                                        //     List<Bucket> buckets = s3client.listBuckets();
-
-                                        //String bucketName = "code-deploy.csye6225-fall2017-patelshu.me";
-
-                                        // String folderName = "FileFolder";
-                                        //createFolder(bucketName, folderName, s3client);
-
-                                        // String folderToPut = folderName + SUFFIX + fileName;
-
-                                        //File f = new File(fileName);
-                                        //file.transferTo(f);
-
-                                        //s3client.putObject(new PutObjectRequest(bucketName, folderToPut, f));
-
-
-
 
 
 
@@ -551,31 +532,25 @@ public class UserController {
                                         flag = true;
                                         System.out.println("You successfully uploaded file");
                                         response.setStatus(200);
-                                        JsonObject j = new JsonObject();
-                                        j.addProperty("Information", "Saved");
-                                        return j.toString();
+                                        return "Saved";
 
 
-                                    }
+
+                                    } //else
+                                    //return "ID does not exists";
                                 }
-                                if (!flag) {
-                                    JsonObject j = new JsonObject();
-                                    j.addProperty("Error", "ID does not exists");
-                                    return j.toString();
-
+                                if (!flag){
+                                    return "ID does not exists";
 
                                 }
 
 
                             } catch (Exception e) {
-                                System.out.println(e);
+                                System.out.println(e.getMessage());
                                 response.setStatus(400);
-                                JsonObject j = new JsonObject();
-                                j.addProperty("Error", "Bad Request");
-                                return j.toString();
-
+                                return "Bad Request";
                             }
-                        } else {
+                        }else {
 
                             JsonObject j = new JsonObject();
                             j.addProperty("Error", "Password Doesn't Match");
@@ -583,20 +558,19 @@ public class UserController {
                         }
 
                     }
-                } while (itr.hasNext());
+                }while (itr.hasNext());
 
                 JsonObject j = new JsonObject();
                 j.addProperty("Error", "User With Given Email " + email + " Doest Exist!!!");
-                return j.toString();
 
+                return j.toString();
             } else {
 
                 JsonObject j = new JsonObject();
                 j.addProperty("Error", "Unauthorized User: You Are Not Logged In");
                 return j.toString();
             }
-
-        } else {
+        }else {
             System.out.println("You failed to upload  because the file was empty.");
 
             JsonObject j = new JsonObject();
@@ -609,8 +583,13 @@ public class UserController {
     }
 
 
+
+
+
+
+
     @RequestMapping(value = "/tasks/{id}/attachments/{idAttachments}", method = RequestMethod.DELETE)
-    public String deleteAttachment(@PathVariable("id") String todotaskid, @PathVariable("idAttachments") String idAttachments, HttpServletRequest request, HttpServletResponse response) {
+    public String deleteAttachment(@PathVariable("id") String todotaskid,@PathVariable("idAttachments") String idAttachments, HttpServletRequest request, HttpServletResponse response) {
 
 
         final String authorization = request.getHeader("Authorization");
@@ -653,23 +632,22 @@ public class UserController {
                                 TodoTask todoTask = (TodoTask) itr2.next();
 
 
-                                //  s3client.deleteObject(bucketName, fileName);
+                                  //  s3client.deleteObject(bucketName, fileName);
 
 
-                                boolean flag1 = false;
-                                TaskAttachments tobedeletd = null;
+boolean flag1=false;
+                                TaskAttachments tobedeletd=null;
 
-                                if (todoTask.getId().equalsIgnoreCase(todotaskid) && todoTask.getUsers() == u1) {
-                                    List<TaskAttachments> attachlist = new ArrayList<TaskAttachments>();
-                                    for (TaskAttachments att : attachlist) {
-                                        if (att.getId().equalsIgnoreCase(attachmentId)) {
+                                if (todoTask.getId().equalsIgnoreCase(todotaskid) && todoTask.getUsers()==u1 ) {
+                                   List<TaskAttachments> attachlist=new ArrayList<TaskAttachments>();
+for(TaskAttachments att: attachlist){
+    if(att.getId().equalsIgnoreCase(attachmentId)){
 
-                                            flag1 = true;
-                                            tobedeletd = att;
-                                        }
-                                    }
-                                    if (flag1) {
-                                        attachmentsDao.delete(tobedeletd);
+        flag1=true;
+         tobedeletd=att;
+    }
+}if(flag1){
+    attachmentsDao.delete(tobedeletd);
                                     }
 
                                     System.out.println("You successfully deleted file");
@@ -677,10 +655,12 @@ public class UserController {
                                     return "deleted";
 
 
+
                                 } //else
                                 //return "ID does not exists";
-
                             }
+                         
+
 
 
                             response.setStatus(400);
@@ -690,15 +670,14 @@ public class UserController {
                             return j.toString();
 
 
+
+
                         } catch (Exception e) {
                             System.out.println(e.getMessage());
                             response.setStatus(400);
-                            JsonObject j = new JsonObject();
-                            j.addProperty("Error", "Bad Request");
-                            return j.toString();
-
+                            return "Bad Request";
                         }
-                    } else {
+                    }else {
 
                         JsonObject j = new JsonObject();
                         j.addProperty("Error", "Password Doesn't Match");
@@ -706,7 +685,7 @@ public class UserController {
                     }
 
                 }
-            } while (itr1.hasNext());
+            }while (itr1.hasNext());
 
             JsonObject j = new JsonObject();
             j.addProperty("Error", "User With Given Email " + email + " Doest Exist!!!");
@@ -721,6 +700,10 @@ public class UserController {
 
 
     }
+
+
+
+
 
 
     @RequestMapping(value = "/tasks/{id}/attachments", method = RequestMethod.GET)
@@ -766,33 +749,35 @@ public class UserController {
 
                                 TodoTask todoTask = (TodoTask) itr.next();
 
-                                if (todoTask.getId().equalsIgnoreCase(taskId) && todoTask.getUsers() == u1) {
+                                if (todoTask.getId().equalsIgnoreCase(taskId) && todoTask.getUsers()==u1) {
 
                                     List<TaskAttachments> tal;
 
-                                    tal = todoTask.getTaskAttachments();
+                                    tal=todoTask.getTaskAttachments();
 
-                                    JSONArray ja = new JSONArray();
-                                    //JsonArray ja = new JsonArray();
+                                    JSONArray ja =new JSONArray();
+                                   //JsonArray ja = new JsonArray();
 
 
-                                    for (TaskAttachments ta : tal) {
+                                    for(TaskAttachments ta : tal){
 
                                         JsonObject jo = new JsonObject();
-                                        jo.addProperty("AttachmentID", ta.getId());
-                                        jo.addProperty("Path", ta.getPath());
-                                        ja.add(jo);
+                                        jo.addProperty("AttachmentID",ta.getId());
+                                        jo.addProperty("Path",ta.getPath());
+                                    ja.add(jo);
 
 
                                     }
 
 
+
                                     response.setStatus(200);
 
-                                    return ja.toString();
+                                    return ja.toString() ;
 
                                 }
                             }
+
 
 
                             response.setStatus(401);
@@ -800,6 +785,10 @@ public class UserController {
                             JsonObject j = new JsonObject();
                             j.addProperty("Error", "Given Task Id doesn't exists");
                             return j.toString();
+
+
+
+
 
 
                         } catch (Exception e) {
@@ -831,7 +820,6 @@ public class UserController {
 
     }
 }
-
 
 
 
