@@ -9,14 +9,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class S3Client {
 
-    public AmazonS3 getS3Client(){
-
-     AWSCredentials credentials = new BasicAWSCredentials("AKIAJHVBBILTLANLCNVQ", "mfnb/gFl/tSpmqGu1Hc03Wj3ncV1eVvCtw6XaTtI");
-
-        AmazonS3 s3client = new AmazonS3Client(credentials);
-
-        return s3client;
-    }
+//    public AmazonS3 getS3Client(){
+//
+//     AWSCredentials credentials = new BasicAWSCredentials("AKIAJHVBBILTLANLCNVQ", "mfnb/gFl/tSpmqGu1Hc03Wj3ncV1eVvCtw6XaTtI");
+//
+//        AmazonS3 s3client = new AmazonS3Client(credentials);
+//
+//        return s3client;
+ //   }
 
 
 }

@@ -5,7 +5,6 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.csye6225.demo.bean.S3Client;
 import com.csye6225.demo.bean.TaskAttachments;
 import com.csye6225.demo.bean.TodoTask;
 import com.csye6225.demo.bean.User;
@@ -28,8 +27,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.charset.Charset;
 import java.util.*;
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.BasicAWSCredentials;
+//import com.amazonaws.auth.AWSCredentials;
+//import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -52,8 +51,8 @@ public class UserController {
     @Autowired
     private AttachmentsDao attachmentsDao;
 
-    @Autowired
-    S3Client s3Client;
+//    @Autowired
+//    S3Client s3Client;
 
     HttpServletRequest request;
     HttpServletResponse response;
