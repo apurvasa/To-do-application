@@ -1,6 +1,12 @@
 package com.csye6225.demo.controllers;
 
 import com.amazonaws.services.s3.AmazonS3;
+
+
+import com.amazonaws.auth.InstanceProfileCredentialsProvider;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.csye6225.demo.bean.S3Client;
@@ -26,7 +32,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.charset.Charset;
 import java.util.*;
-
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.S3ObjectSummary;
 
 @RestController
 public class UserController {
@@ -44,13 +56,20 @@ public class UserController {
     @Autowired
     private AttachmentsDao attachmentsDao;
 
-    @Autowired
-    S3Client s3Client;
 
     HttpServletRequest request;
     HttpServletResponse response;
 
     private static final String SUFFIX = "/";
+
+
+            AmazonS3 s3client= AmazonS3ClientBuilder.standard().withCredentials(new InstanceProfileCredentialsProvider(false)).build();
+
+    String bucketName = "code-deploy.csye6225-fall2017-chabhadiar.me.com";
+
+
+
+
 
     @RequestMapping(value = "/user/register", method = RequestMethod.POST)
     public Object register(@RequestBody JSONObject jo) {
@@ -381,10 +400,11 @@ public class UserController {
     }
 
 
-
     @RequestMapping(value = "/tasks/{id}/attachments", method = RequestMethod.POST, produces = "application/json", consumes = "multipart/form-data")
     public String addAttachments(HttpServletRequest request, HttpServletResponse response, @PathVariable("id") String id,
                                  @RequestParam("file") MultipartFile file) {
+
+        System.out.println("hii");
 
 
         if (!file.isEmpty()) {
@@ -429,22 +449,50 @@ public class UserController {
 
                                     TodoTask todoTask = (TodoTask) itr1.next();
 
-
-                                    if (todoTask.getId().equalsIgnoreCase(taskId) && todoTask.getUsers()==u1) {
-
+                                    System.out.println("task id: "+todoTask.getId());
+                                    if (todoTask.getId().equalsIgnoreCase(taskId)) {
+                                        //create folder on s3 bucket
+                                      //  createFolder(bucketName, taskId, s3client);
 
                                         String fileName = file.getOriginalFilename();
-
-
-                                        byte[] bytes = file.getBytes();
                                         Path path = Paths.get(fileName);
+                                        byte[] bytes = file.getBytes();
+
                                         Files.write(path, bytes);
 
-                                        AmazonS3 s3client = s3Client.getS3Client();
+
+//                                        //  String fileName = folderName + SUFFIX + "testvideo.mp4";
+//                                        s3client.putObject(new PutObjectRequest(bucketName, fileName, new File(fileName)));
+//
+//                                        AmazonS3 s3client = s3Client.getS3Client();
+//
+//                                        //     List<Bucket> buckets = s3client.listBuckets();
+//
+//                                        String bucketName = "code-deploy.csye6225-fall2017-patelshu.me";
+//
+//                                        String folderName = "FileFolder";
+//                                        createFolder(bucketName, folderName, s3client);
+//
+//                                        String folderToPut = folderName + SUFFIX + fileName;
+//
+//                                        File f = new File(fileName);
+//                                        file.transferTo(f);
+//
+//                                        s3client.putObject(new PutObjectRequest(bucketName, folderToPut, f));
+
+
+
+
+
+                                        //  String fileName = folderName + SUFFIX + "testvideo.mp4";
+                                        // s3client.putObject(new PutObjectRequest(bucketName, fileName, new File(fileName)));
+
+
+
 
                                         //     List<Bucket> buckets = s3client.listBuckets();
 
-                                        String bucketName = "code-deploy.csye6225-fall2017-patelshu.me";
+                                        String bucketName = System.getProperty("bucket.name");
 
                                         String folderName = "FileFolder";
                                         createFolder(bucketName, folderName, s3client);
@@ -574,6 +622,7 @@ public class UserController {
 
                             Iterable<TodoTask> tasks = taskDao.findAll();
 
+
                             Iterator itr2 = tasks.iterator();
 
                             while (itr2.hasNext()) {
@@ -584,8 +633,11 @@ public class UserController {
                                 //  s3client.deleteObject(bucketName, fileName);
 
 
+                                  //  s3client.deleteObject(bucketName, fileName);
+
+
                                 boolean flag1 = false;
-                                //TaskAttachments tobedeletd = null;
+
 
                                 if (todoTask.getId().equalsIgnoreCase(todotaskid) && todoTask.getUsers() == u1) {
                                     List<TaskAttachments> attachlist = todoTask.getTaskAttachments();
@@ -595,6 +647,12 @@ public class UserController {
 
                                             flag1 = true;
                                             attachmentsDao.delete(att);
+                                            JsonObject j = new JsonObject();
+                                            j.addProperty("Information", "Attachment Deleted");
+                                            response.setStatus(200);
+                                            return j.toString();
+
+
 
                                         }
                                     }
@@ -613,7 +671,9 @@ public class UserController {
 
 
                                 }
+
                             }
+                         
 
 
                         } catch (Exception e) {
