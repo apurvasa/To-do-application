@@ -8,7 +8,7 @@ install: true
 script:
   - ./gradlew build
   - mkdir codedeploy
-  - zip -r csye6225-${TRAVIS_JOB_NUMBER}.zip build/libs/ROOT.war appspec.yml restartTomcat.sh
+  - zip -r csye6225-${TRAVIS_JOB_NUMBER}.zip build/libs/ROOT.war appspec.yml restart.sh
   - ls -al
   - mv csye6225-${TRAVIS_JOB_NUMBER}.zip codedeploy/
   - ls -al
