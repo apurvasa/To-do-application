@@ -252,7 +252,7 @@
 								"codedeploy:GetApplicationRevision"
 							],
 							"Resource": [
-								"arn:aws:codedeploy:us-east-1:522609256606:application:SimpleTestJAVA"
+								"arn:aws:codedeploy:us-east-1:149507073687:application:csye6225"
 							]
 						},
 						{
@@ -271,9 +271,9 @@
 								"codedeploy:GetDeploymentConfig"
 							],
 							"Resource": [
-								"arn:aws:codedeploy:us-east-1:522609256606:deploymentconfig:CodeDeployDefault.OneAtATime",
-								"arn:aws:codedeploy:us-east-1:522609256606:deploymentconfig:CodeDeployDefault.HalfAtATime",
-								"arn:aws:codedeploy:us-east-1:522609256606:deploymentconfig:CodeDeployDefault.AllAtOnce"
+								"arn:aws:codedeploy:us-east-1:149507073687:deploymentconfig:CodeDeployDefault.OneAtATime",
+								"arn:aws:codedeploy:us-east-1:149507073687:deploymentconfig:CodeDeployDefault.HalfAtATime",
+								"arn:aws:codedeploy:us-east-1:149507073687:deploymentconfig:CodeDeployDefault.AllAtOnce"
 							]
 						}
 					]
