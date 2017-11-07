@@ -29,7 +29,8 @@ deploy:
    bucket: csye6225-fall2017-sawantap.me.csye6225.com
    region: us-east-1
    skip_cleanup: true
-   all_branches: true
+   on :
+    all_branches: true
  - provider: codedeploy
    access_key_id: $ACCESS_ID
    bucket: csye6225-fall2017-sawantap.me.csye6225.com
@@ -40,7 +41,8 @@ deploy:
    region: us-east-1
    secret_access_key: $ACCESS_KEY
    wait-until-deployed: true
-   all_branches: true
+   on :
+    all_branches: true
 
 notifications:
   email:
