@@ -496,7 +496,7 @@ public class UserController {
 //
 //                                        //     List<Bucket> buckets = s3client.listBuckets();
 //
-//                                        String bucketName = "code-deploy.csye6225-fall2017-patelshu.me";
+                                        String bucketName = "csye6225-fall2017-sawantap.me.csye6225.com";
 //
 //                                        String folderName = "FileFolder";
 //                                        createFolder(bucketName, folderName, s3client);
@@ -510,7 +510,7 @@ public class UserController {
 
 
                                         String buc=System.getProperty("bucket.name");
-                                        createFolder(buc, file);
+                                        createFolder(bucketName, file);
 
                                         //  String fileName = folderName + SUFFIX + "testvideo.mp4";
                                         // s3client.putObject(new PutObjectRequest(bucketName, fileName, new File(fileName)));
@@ -518,8 +518,8 @@ public class UserController {
 
 
                                         TaskAttachments ta = new TaskAttachments();
-
-                                        ta.setPath(path.toString());
+                                        ta.setPath("https://s3.amazonaws.com/"+bucketName+"/"+fileName);
+                                     //   ta.setPath(path.toString());
                                         ta.setId(generateUUID.getUUID());
                                         ta.setTodoTask(todoTask);
 
