@@ -7,50 +7,44 @@ install: true
 
 script:
   - ./gradlew build
+  - mkdir codedeploy
+  - zip -r csye6225-${TRAVIS_JOB_NUMBER}.zip build/libs/ROOT.war appspec.yml restartTomcat.sh
+  - ls -al
+  - mv csye6225-${TRAVIS_JOB_NUMBER}.zip codedeploy/
+  - ls -al
+  - pwd
+  - cd codedeploy
+  - ls -al
+  - pwd
+  - cd ..
 
-
-after_success:
- - mkdir codedeploy
- - zip -r csye6225.zip build/libs/ROOT.war appspec.yml restart.sh
- - ls -al
- - mv csye6225.zip codedeploy/
- - ls -al
- - pwd
- - cd codedeploy
- - ls -al
- - pwd
-
-
-before_deploy:
- - cd ..
-
+before-deploy:
+  - ls -al
 
 deploy:
  - provider: s3
    access_key_id: $ACCESS_ID
    secret_access_key: $ACCESS_KEY
    local_dir: codedeploy
-   bucket: $bucket
+   bucket: csye6225-fall2017-sawantap.me.csye6225.com
    region: us-east-1
    skip_cleanup: true
-   on :
-    all_branches: true
+   all_branches: true
  - provider: codedeploy
    access_key_id: $ACCESS_ID
-   secret_access_key: $ACCESS_KEY
-   bucket: $bucket
-   key: csye6225.zip
+   bucket: csye6225-fall2017-sawantap.me.csye6225.com
+   key: csye6225-${TRAVIS_JOB_NUMBER}.zip
    bundle_type: zip
    application: csye6225
    deployment_group: csye6225
    region: us-east-1
+   secret_access_key: $ACCESS_KEY
    wait-until-deployed: true
-   on :
-    all_branches: true
+   all_branches: true
 
 notifications:
   email:
     recipients:
     - patel.shu@husky.neu.edu
     - sawant.ap@husky.neu.edu
-- chabhadia.r@husky.neu.edu
+    - chabhadia.r@husky.neu.edu
