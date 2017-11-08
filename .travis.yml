@@ -7,41 +7,46 @@ install: true
 
 script:
   - ./gradlew build
-  - mkdir codedeploy
-  - zip -r csye6225-${TRAVIS_JOB_NUMBER}.zip build/libs/ROOT.war appspec.yml
-  - ls -al
-  - mv csye6225-${TRAVIS_JOB_NUMBER}.zip codedeploy/
-  - ls -al
-  - pwd
-  - cd codedeploy
-  - ls -al
-  - pwd
-  - cd ..
 
-before-deploy:
-  - ls -al
+
+after_success:
+ - mkdir codedeploy
+ - zip -r csye6225.zip build/libs/ROOT.war appspec.yml restart.sh
+ - ls -al
+ - mv csye6225.zip codedeploy/
+ - ls -al
+ - pwd
+ - cd codedeploy
+ - ls -al
+ - pwd
+
+
+before_deploy:
+ - cd ..
+
 
 deploy:
  - provider: s3
-   access_key_id: AKIAJOL6HUEB7XIADEUA
-   secret_access_key:
-    secure: ER0yVHZvA2FU97YZ8r+St5O9u3I1a4HNDndE2zWpIBeR0KMycsMz9Z0ofqglO+xfdpvyAWOvTuZP/jsWXdByN7Ahf6ccke/blihclywrVKNVArYnc03lj7emsy5sywJFrdQvyZisdw8EdJp15+2FIP4+haEqiNFUiIgyIWwMRPfFEUlxBAJ3DvHS4g4PjDy0peGy6OpNg0O/qDEc9/25H92DFtKnPobHaUcbLusFCLI6XRZm0m4bQ/xkV8CcG03i+itjUoXrbfwTpo0vIUuNLuaA2GHZoxotcAf5faSphBhpVFAjjXI7nLDvaUM9ujelL4ZFdcpwxPKz+Ka5W9sP6r1Iq1OyPhXqiAJttEA36Ot3x5iPcbnsqoUUcT08A6w9u96DVMC0k8T5YMn31zf7910o+QULpiU5N/bbiR8S0miK82LGxohN03wCdhoqSzJFqmX1JBuDZTkNf4P1f1FFMJ19PUc5YTcUJlPmnUDvrpORCqLVgXr4uMjX9yI3z3SnkIjFBckPAobtUEmiK2D4ym4/5P8uRrGVCmFUkwUUm00cigwSOoG5YfK5WYUQr7QJHnX4jVcUAZC4F4N21aK2N8vubB1/U9UolZDVF3RAAjsLVa+135EotgVW4rgl3mI7P3yVf1Fw8HM0+Wz9JQXAm2Tz2HOPFkAsd8/qZtwJfdU=
+   access_key_id: $access_key_id
+   secret_access_key: $secret_access_key
    local_dir: codedeploy
-   bucket: code-deploy.csye6225-fall2017-sawantap.me.com
+   bucket: $bucket
    region: us-east-1
    skip_cleanup: true
-   all_branches: true
+   on :
+    all_branches: true
  - provider: codedeploy
-   access_key_id: AKIAJOL6HUEB7XIADEUA
-   secret_access_key:
-    secure: ER0yVHZvA2FU97YZ8r+St5O9u3I1a4HNDndE2zWpIBeR0KMycsMz9Z0ofqglO+xfdpvyAWOvTuZP/jsWXdByN7Ahf6ccke/blihclywrVKNVArYnc03lj7emsy5sywJFrdQvyZisdw8EdJp15+2FIP4+haEqiNFUiIgyIWwMRPfFEUlxBAJ3DvHS4g4PjDy0peGy6OpNg0O/qDEc9/25H92DFtKnPobHaUcbLusFCLI6XRZm0m4bQ/xkV8CcG03i+itjUoXrbfwTpo0vIUuNLuaA2GHZoxotcAf5faSphBhpVFAjjXI7nLDvaUM9ujelL4ZFdcpwxPKz+Ka5W9sP6r1Iq1OyPhXqiAJttEA36Ot3x5iPcbnsqoUUcT08A6w9u96DVMC0k8T5YMn31zf7910o+QULpiU5N/bbiR8S0miK82LGxohN03wCdhoqSzJFqmX1JBuDZTkNf4P1f1FFMJ19PUc5YTcUJlPmnUDvrpORCqLVgXr4uMjX9yI3z3SnkIjFBckPAobtUEmiK2D4ym4/5P8uRrGVCmFUkwUUm00cigwSOoG5YfK5WYUQr7QJHnX4jVcUAZC4F4N21aK2N8vubB1/U9UolZDVF3RAAjsLVa+135EotgVW4rgl3mI7P3yVf1Fw8HM0+Wz9JQXAm2Tz2HOPFkAsd8/qZtwJfdU=
-   bucket: code-deploy.csye6225-fall2017-sawantap.me.com
-   key: csye6225-${TRAVIS_JOB_NUMBER}.zip
+   access_key_id: $access_key_id
+   secret_access_key: $secret_access_key
+   bucket: $bucket
+   key: csye6225.zip
    bundle_type: zip
-   application: code-deploy.csye6225.com
-   deployment_group: code-deploy.csye6225.com
+   application: SimpleTestJAVA
+   deployment_group: CSYE6225
    region: us-east-1
-wait-until-deployed: true
+   wait-until-deployed: true
+   on :
+    all_branches: true
 
 notifications:
   email:
@@ -49,4 +54,3 @@ notifications:
     - patel.shu@husky.neu.edu
     - sawant.ap@husky.neu.edu
     - chabhadia.r@husky.neu.edu
-
