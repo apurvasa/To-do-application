@@ -434,6 +434,7 @@
 					"WriteCapacityUnits": "5"
 				},
   "TimeToLiveSpecification": {
+				"TimeToLiveSpecification": {
     "AttributeName": "TimeToLive",
     "Enabled": "TRUE"
   }
