@@ -1,12 +1,9 @@
 package com.csye6225.demo.controllers;
 
-import com.amazonaws.services.s3.AmazonS3;
-
 
 import com.amazonaws.auth.InstanceProfileCredentialsProvider;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.csye6225.demo.bean.S3Client;
@@ -18,14 +15,19 @@ import com.csye6225.demo.dao.TaskDao;
 import com.csye6225.demo.dao.UserDao;
 import com.csye6225.demo.services.GenerateUUID;
 import com.google.gson.*;
+import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -53,20 +55,14 @@ public class UserController {
     @Autowired
     private TaskDao taskDao;
 
+
     @Autowired
     private AttachmentsDao attachmentsDao;
-
-
-    HttpServletRequest request;
-    HttpServletResponse response;
-
-    private static final String SUFFIX = "/";
 
 
             AmazonS3 s3client= AmazonS3ClientBuilder.standard().withCredentials(new InstanceProfileCredentialsProvider(false)).build();
 
     String bucketName = "code-deploy.csye6225-fall2017-chabhadiar.me.com";
-
 
 
 
@@ -91,11 +87,7 @@ public class UserController {
 
             if (user.getEmail().equalsIgnoreCase(email)) {
 
-                JsonObject j = new JsonObject();
-                j.addProperty("Message", "User already exist!!!");
-
-                return jo;
-
+                return "User already exist!!!";
             }
 
 
@@ -305,10 +297,9 @@ public class UserController {
             JsonObject j = new JsonObject();
             j.addProperty("Error", "Unauthorized User: You Are Not Logged In");
 
-            return j.toString();
         }
 
-
+        return null;
     }
 
     @RequestMapping(value = "/tasks/{id}", method = RequestMethod.DELETE)
@@ -393,14 +384,52 @@ public class UserController {
             JsonObject j = new JsonObject();
             j.addProperty("Error", "Unauthorized User: You Are Not Logged In");
 
-            return j.toString();
         }
 
-
+        return null;
     }
 
 
+
+
+    public static void createFolder(String bucketName, MultipartFile multipartfile) {
+//        // create meta-data for your folder and set content-length to 0
+//        System.out.println("entered in fn");
+//        String buc=System.getProperty("bucket.name");
+//        System.out.println("buckettt"+buc);
+//        //  ObjectMetadata metadata = new ObjectMetadata();
+//        //  metadata.setContentLength(0);
+//        // create empty content
+//        //  InputStream emptyContent = new ByteArrayInputStream(new byte[0]);
+//        // create a PutObjectRequest passing the folder name suffixed by /
+//        System.out.println("inputstream created");
+//        PutObjectRequest putObjectRequest = new PutObjectRequest(buc, "test", folderName);
+//        // send request to S3 to create folder
+//        System.out.println("send request to s3");
+//        client.putObject(putObjectRequest);
+//        System.out.println("put object");
+        AmazonS3 s3client= AmazonS3ClientBuilder.standard().withCredentials(new InstanceProfileCredentialsProvider(false)).build();
+
+        File newFile=new File(multipartfile.getOriginalFilename());
+        try {
+            newFile.createNewFile();
+            FileOutputStream fs=new FileOutputStream(newFile);
+            fs.write(multipartfile.getBytes());
+            fs.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        s3client.putObject(new PutObjectRequest(bucketName,newFile.getName(),newFile));
+
+
+    
+    }
+
+
+
     @RequestMapping(value = "/tasks/{id}/attachments", method = RequestMethod.POST, produces = "application/json", consumes = "multipart/form-data")
+    @ResponseBody
     public String addAttachments(HttpServletRequest request, HttpServletResponse response, @PathVariable("id") String id,
                                  @RequestParam("file") MultipartFile file) {
 
@@ -481,28 +510,11 @@ public class UserController {
 //                                        s3client.putObject(new PutObjectRequest(bucketName, folderToPut, f));
 
 
-
-
+                                        String buc=System.getProperty("bucket.name");
+                                        createFolder(buc, file);
 
                                         //  String fileName = folderName + SUFFIX + "testvideo.mp4";
                                         // s3client.putObject(new PutObjectRequest(bucketName, fileName, new File(fileName)));
-
-
-
-
-                                        //     List<Bucket> buckets = s3client.listBuckets();
-
-                                        String bucketName = System.getProperty("bucket.name");
-
-                                        String folderName = "FileFolder";
-                                        createFolder(bucketName, folderName, s3client);
-
-                                        String folderToPut = folderName + SUFFIX + fileName;
-
-                                        File f= new File(fileName);
-                                        file.transferTo(f);
-
-                                        s3client.putObject(new PutObjectRequest(bucketName, folderToPut, f));
 
 
 
@@ -520,31 +532,23 @@ public class UserController {
                                         flag = true;
                                         System.out.println("You successfully uploaded file");
                                         response.setStatus(200);
-                                        JsonObject j = new JsonObject();
-                                        j.addProperty("Information", "Saved");
-                                        return j.toString();
+                                        return "Saved";
 
 
 
-
-                                    }
+                                    } //else
+                                    //return "ID does not exists";
                                 }
                                 if (!flag){
-                                    JsonObject j = new JsonObject();
-                                    j.addProperty("Error", "ID does not exists");
-                                    return j.toString();
-
+                                    return "ID does not exists";
 
                                 }
 
 
                             } catch (Exception e) {
-                                System.out.println(e);
+                                System.out.println(e.getMessage());
                                 response.setStatus(400);
-                                JsonObject j = new JsonObject();
-                                j.addProperty("Error", "Bad Request");
-                                return j.toString();
-
+                                return "Bad Request";
                             }
                         }else {
 
@@ -558,15 +562,14 @@ public class UserController {
 
                 JsonObject j = new JsonObject();
                 j.addProperty("Error", "User With Given Email " + email + " Doest Exist!!!");
-                return j.toString();
 
+                return j.toString();
             } else {
 
                 JsonObject j = new JsonObject();
                 j.addProperty("Error", "Unauthorized User: You Are Not Logged In");
                 return j.toString();
             }
-
         }else {
             System.out.println("You failed to upload  because the file was empty.");
 
@@ -622,7 +625,6 @@ public class UserController {
 
                             Iterable<TodoTask> tasks = taskDao.findAll();
 
-
                             Iterator itr2 = tasks.iterator();
 
                             while (itr2.hasNext()) {
@@ -630,59 +632,50 @@ public class UserController {
                                 TodoTask todoTask = (TodoTask) itr2.next();
 
 
-                                //  s3client.deleteObject(bucketName, fileName);
-
-
                                   //  s3client.deleteObject(bucketName, fileName);
 
 
-                                boolean flag1 = false;
+boolean flag1=false;
+                                TaskAttachments tobedeletd=null;
 
+                                if (todoTask.getId().equalsIgnoreCase(todotaskid) && todoTask.getUsers()==u1 ) {
+                                   List<TaskAttachments> attachlist=new ArrayList<TaskAttachments>();
+for(TaskAttachments att: attachlist){
+    if(att.getId().equalsIgnoreCase(attachmentId)){
 
-                                if (todoTask.getId().equalsIgnoreCase(todotaskid) && todoTask.getUsers() == u1) {
-                                    List<TaskAttachments> attachlist = todoTask.getTaskAttachments();
-
-                                    for (TaskAttachments att : attachlist) {
-                                        if (att.getId().equalsIgnoreCase(attachmentId)) {
-
-                                            flag1 = true;
-                                            attachmentsDao.delete(att);
-                                            JsonObject j = new JsonObject();
-                                            j.addProperty("Information", "Attachment Deleted");
-                                            response.setStatus(200);
-                                            return j.toString();
-
-
-
-                                        }
-                                    }
-                                    if (!flag1) {
-                                        JsonObject j = new JsonObject();
-                                        j.addProperty("Error", "ID does not exists");
-                                        return j.toString();
+        flag1=true;
+         tobedeletd=att;
+    }
+}if(flag1){
+    attachmentsDao.delete(tobedeletd);
                                     }
 
-
-                                    response.setStatus(400);
-
-                                    JsonObject j = new JsonObject();
-                                    j.addProperty("Error", "Given Task Id doesn't exists");
-                                    return j.toString();
+                                    System.out.println("You successfully deleted file");
+                                    response.setStatus(200);
+                                    return "deleted";
 
 
-                                }
 
+                                } //else
+                                //return "ID does not exists";
                             }
                          
+
+
+
+                            response.setStatus(400);
+
+                            JsonObject j = new JsonObject();
+                            j.addProperty("Error", "Given Task Id doesn't exists");
+                            return j.toString();
+
+
 
 
                         } catch (Exception e) {
                             System.out.println(e.getMessage());
                             response.setStatus(400);
-                            JsonObject j = new JsonObject();
-                            j.addProperty("Error", "Bad Request");
-                            return j.toString();
-
+                            return "Bad Request";
                         }
                     }else {
 
@@ -825,19 +818,6 @@ public class UserController {
         }
 
 
-    }
-
-    public static void createFolder(String bucketName, String folderName, AmazonS3 client) {
-        // create meta-data for your folder and set content-length to 0
-        ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentLength(0);
-        // create empty content
-        InputStream emptyContent = new ByteArrayInputStream(new byte[0]);
-        // create a PutObjectRequest passing the folder name suffixed by /
-        PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName,
-                folderName + SUFFIX, emptyContent, metadata);
-        // send request to S3 to create folder
-        client.putObject(putObjectRequest);
     }
 }
 
