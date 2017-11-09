@@ -1,10 +1,16 @@
 package com.csye6225.demo.controllers;
 
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.auth.InstanceProfileCredentialsProvider;
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.sns.AmazonSNSClient;
+import com.amazonaws.services.sns.model.PublishRequest;
+import com.amazonaws.services.sns.model.PublishResult;
 import com.csye6225.demo.bean.TaskAttachments;
 import com.csye6225.demo.bean.TodoTask;
 import com.csye6225.demo.bean.User;
@@ -392,6 +398,29 @@ public class UserController {
         }
 
 
+    }
+
+
+
+    @RequestMapping(value = "/forgot-password", method = RequestMethod.POST)
+    @ResponseBody
+    public String reset(@RequestBody JSONObject jo) {
+
+        System.out.println(jo.toString());
+        String userName = jo.get("Username").toString();
+//http://example.com/reset?email=user@somedomain.com&token=4e163b8b-889a-4ce7-a3f7-61041e323c23
+        //publish to an SNS topic
+        //create a new SNS client and set endpoint
+        AmazonSNSClient snsClient = new AmazonSNSClient(new DefaultAWSCredentialsProviderChain());
+        // AmazonSNSClient snsClient = AmazonSNSClientBuilder.standard().withCredentials(new InstanceProfileCredentialsProvider(false)).build();
+        snsClient.setRegion(Region.getRegion(Regions.US_EAST_1));
+
+        String topicArn = "arn:aws:sns:us-east-1:522609256606:testdem0";
+        PublishRequest publishRequest = new PublishRequest(topicArn, userName);
+        PublishResult publishResult = snsClient.publish(publishRequest);
+//print MessageId of message published to SNS topic
+        System.out.println("MessageId - " + publishResult.getMessageId());
+        return publishResult.getMessageId();
     }
 
 

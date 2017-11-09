@@ -79,6 +79,12 @@
 		},
 		"TravisCodeDep":{
 			"Type":"String"
+		},
+		"LamdaSnsRole":{
+			"Type":"String"
+		},
+		"SnsTopic":{
+			"Type":"String"
 		}
 	},
 	"Resources":{
@@ -320,6 +326,24 @@
 				"RoleName": {"Ref" :"CodeDepRole"}
 			}
 		},
+		"LamdaSNSRole":{
+			"Type": "AWS::IAM::Role",
+			"Properties": {
+				"AssumeRolePolicyDocument": {
+					"Version" : "2012-10-17",
+					"Statement": [ {
+						"Effect": "Allow",
+						"Principal": {
+							"Service": [ "lambda.amazonaws.com" ]
+						},
+						"Action": [ "sts:AssumeRole" ]
+					} ]
+				},
+
+				"ManagedPolicyArns": ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole","arn:aws:iam::aws:policy/AmazonSNSFullAccess","arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess","arn:aws:iam::aws:policy/AmazonSESFullAccess"],
+				"RoleName": {"Ref" :"LamdaSnsRole"}
+			}
+		},
 
 		"CodeDeployServiceRoleInstanceProfile":
 		{ "Type": "AWS::IAM::InstanceProfile",
@@ -398,6 +422,12 @@
 						"Ref": "PrimaryKeyName"
 					},
 					"AttributeType": "S"
+				},{
+					"AttributeName" : "userName",
+					"AttributeType" : "S"
+				},{
+					"AttributeName" : "token",
+					"AttributeType" : "S"
 				}],
 				"KeySchema": [{
 					"AttributeName": {
@@ -437,6 +467,13 @@
 				],
 				"TTL":"60",
 				"Type":"A"
+			}
+		},
+
+		"MySNSTopic" : {
+			"Type" : "AWS::SNS::Topic",
+			"Properties" : {
+				"TopicName" : {"Ref":"SnsTopic"}
 			}
 		}
 	}
