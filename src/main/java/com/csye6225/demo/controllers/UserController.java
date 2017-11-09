@@ -1,5 +1,16 @@
 package com.csye6225.demo.controllers;
 
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
+import com.amazonaws.auth.InstanceProfileCredentialsProvider;
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.sns.AmazonSNSClient;
+import com.amazonaws.services.sns.model.PublishRequest;
+import com.amazonaws.services.sns.model.PublishResult;
 import com.csye6225.demo.bean.TaskAttachments;
 import com.csye6225.demo.bean.TodoTask;
 import com.csye6225.demo.bean.User;
@@ -12,23 +23,19 @@ import javax.servlet.http.HttpServletRequest;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.charset.Charset;
 import java.util.*;
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.BasicAWSCredentials;
+//import com.amazonaws.auth.AWSCredentials;
+//import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -48,14 +55,24 @@ public class UserController {
     @Autowired
     private TaskDao taskDao;
 
-
     @Autowired
     private AttachmentsDao attachmentsDao;
 
-    AWSCredentials s3credentials = new BasicAWSCredentials("AKIAJ23IXTRAFUN2XXJA", "sZV9iQAZHjo4SF+ii58g9JY59vaSBdviy39YjYMD");
-    AmazonS3 s3client = new AmazonS3Client(s3credentials);
+//    @Autowired
+//    S3Client s3Client;
 
-    String bucketName = "code-deploy.csye6225-fall2017-sawantap.me.com";
+    HttpServletRequest request;
+    HttpServletResponse response;
+
+    private static final String SUFFIX = "/";
+
+
+
+            AmazonS3 s3client= AmazonS3ClientBuilder.standard().withCredentials(new InstanceProfileCredentialsProvider(false)).build();
+
+    String bucketName = "code-deploy.csye6225-fall2017-chabhadiar.me.com";
+
+
 
 
     @RequestMapping(value = "/user/register", method = RequestMethod.POST)
@@ -78,7 +95,11 @@ public class UserController {
 
             if (user.getEmail().equalsIgnoreCase(email)) {
 
-                return "User already exist!!!";
+                JsonObject j = new JsonObject();
+                j.addProperty("Message", "User already exist!!!");
+
+                return jo;
+
             }
 
 
@@ -190,7 +211,6 @@ public class UserController {
         }
 
 
-
         return null;
     }
 
@@ -236,7 +256,7 @@ public class UserController {
 
                             TodoTask todo = (TodoTask) itr1.next();
 
-                            if (todo.getId().equalsIgnoreCase(taskId)) {
+                            if (todo.getId().equalsIgnoreCase(taskId) && todo.getUsers() == u1) {
 
                                 Long userId = todo.getUsers().getUserId();
 
@@ -269,7 +289,7 @@ public class UserController {
                         return j.toString();
 
 
-                    }else {
+                    } else {
 
                         JsonObject j = new JsonObject();
                         j.addProperty("Error", "Password Doesn't Match");
@@ -288,9 +308,10 @@ public class UserController {
             JsonObject j = new JsonObject();
             j.addProperty("Error", "Unauthorized User: You Are Not Logged In");
 
+            return j.toString();
         }
 
-        return null;
+
     }
 
     @RequestMapping(value = "/tasks/{id}", method = RequestMethod.DELETE)
@@ -325,7 +346,6 @@ public class UserController {
                     if (BCrypt.checkpw(password, u1.getPassword())) {
 
 
-
                         String taskId = id;
 
                         Iterable<TodoTask> tasks = taskDao.findAll();
@@ -336,13 +356,13 @@ public class UserController {
 
                             TodoTask todoTask = (TodoTask) itr1.next();
 
-                            if (todoTask.getId().equalsIgnoreCase(taskId)) {
+                            if (todoTask.getId().equalsIgnoreCase(taskId) && todoTask.getUsers() == u1) {
 
                                 taskDao.delete(todoTask);
                                 response.setStatus(204);
 
                                 JsonObject j = new JsonObject();
-                                j.addProperty("Information", "Task Id: " +taskId+ " has been deleted");
+                                j.addProperty("Information", "Task Id: " + taskId + " has been deleted");
                                 return j.toString();
 
 
@@ -356,7 +376,7 @@ public class UserController {
                         return j.toString();
 
 
-                    }else {
+                    } else {
 
                         JsonObject j = new JsonObject();
                         j.addProperty("Error", "Password Doesn't Match");
@@ -375,29 +395,72 @@ public class UserController {
             JsonObject j = new JsonObject();
             j.addProperty("Error", "Unauthorized User: You Are Not Logged In");
 
+            return j.toString();
         }
 
-        return null;
+
     }
 
-    public static void createFolder(String bucketName, String folderName, AmazonS3 client) {
-        // create meta-data for your folder and set content-length to 0
-        System.out.println("entered in fn");
-      //  ObjectMetadata metadata = new ObjectMetadata();
-      //  metadata.setContentLength(0);
-        // create empty content
-      //  InputStream emptyContent = new ByteArrayInputStream(new byte[0]);
-        // create a PutObjectRequest passing the folder name suffixed by /
-        System.out.println("inputstream created");
-        PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName,"test",folderName);
-        // send request to S3 to create folder
-        System.out.println("send request to s3");
-        client.putObject(putObjectRequest);
-        System.out.println("put object");
+
+
+    @RequestMapping(value = "/forgot-password", method = RequestMethod.POST)
+    @ResponseBody
+    public String reset(@RequestBody JSONObject jo) {
+
+        System.out.println(jo.toString());
+        String userName = jo.get("Username").toString();
+//http://example.com/reset?email=user@somedomain.com&token=4e163b8b-889a-4ce7-a3f7-61041e323c23
+        //publish to an SNS topic
+        //create a new SNS client and set endpoint
+        AmazonSNSClient snsClient = new AmazonSNSClient(new DefaultAWSCredentialsProviderChain());
+        // AmazonSNSClient snsClient = AmazonSNSClientBuilder.standard().withCredentials(new InstanceProfileCredentialsProvider(false)).build();
+        snsClient.setRegion(Region.getRegion(Regions.US_EAST_1));
+
+        String topicArn = "arn:aws:sns:us-east-1:522609256606:testdem0";
+        PublishRequest publishRequest = new PublishRequest(topicArn, userName);
+        PublishResult publishResult = snsClient.publish(publishRequest);
+//print MessageId of message published to SNS topic
+        System.out.println("MessageId - " + publishResult.getMessageId());
+        return publishResult.getMessageId();
     }
+
+
+
+    public static void createFolder(String bucketName, MultipartFile multipartfile) {
+//        // create meta-data for your folder and set content-length to 0
+//        System.out.println("entered in fn");
+//        String buc=System.getProperty("bucket.name");
+//        System.out.println("buckettt"+buc);
+//        //  ObjectMetadata metadata = new ObjectMetadata();
+//        //  metadata.setContentLength(0);
+//        // create empty content
+//        //  InputStream emptyContent = new ByteArrayInputStream(new byte[0]);
+//        // create a PutObjectRequest passing the folder name suffixed by /
+//        System.out.println("inputstream created");
+//        PutObjectRequest putObjectRequest = new PutObjectRequest(buc, "test", folderName);
+//        // send request to S3 to create folder
+//        System.out.println("send request to s3");
+//        client.putObject(putObjectRequest);
+//        System.out.println("put object");
+        AmazonS3 s3client= AmazonS3ClientBuilder.standard().withCredentials(new InstanceProfileCredentialsProvider(false)).build();
+
+        File newFile=new File(multipartfile.getOriginalFilename());
+        try {
+            newFile.createNewFile();
+            FileOutputStream fs=new FileOutputStream(newFile);
+            fs.write(multipartfile.getBytes());
+            fs.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        s3client.putObject(new PutObjectRequest(bucketName,newFile.getName(),newFile));
+
+    }
+
+
 
     @RequestMapping(value = "/tasks/{id}/attachments", method = RequestMethod.POST, produces = "application/json", consumes = "multipart/form-data")
-    @ResponseBody
     public String addAttachments(HttpServletRequest request, HttpServletResponse response, @PathVariable("id") String id,
                                  @RequestParam("file") MultipartFile file) {
 
@@ -445,26 +508,65 @@ public class UserController {
                                 while (itr1.hasNext()) {
 
                                     TodoTask todoTask = (TodoTask) itr1.next();
-                                  //  System.out.println("task id: "+todoTask.getId());
+
+                                    System.out.println("task id: " + todoTask.getId());
                                     if (todoTask.getId().equalsIgnoreCase(taskId)) {
                                         //create folder on s3 bucket
-                                      //  createFolder(bucketName, taskId, s3client);
+                                        //  createFolder(bucketName, taskId, s3client);
+
                                         String fileName = file.getOriginalFilename();
                                         Path path = Paths.get(fileName);
-
-
                                         byte[] bytes = file.getBytes();
 
                                         Files.write(path, bytes);
 
+//                                        //  String fileName = folderName + SUFFIX + "testvideo.mp4";
+//                                        s3client.putObject(new PutObjectRequest(bucketName, fileName, new File(fileName)));
+//
+//                                        AmazonS3 s3client = s3Client.getS3Client();
+//
+//                                        //     List<Bucket> buckets = s3client.listBuckets();
+//
+//                                        String bucketName = "code-deploy.csye6225-fall2017-patelshu.me";
+//
+//                                        String folderName = "FileFolder";
+//                                        createFolder(bucketName, folderName, s3client);
+//
+//                                        String folderToPut = folderName + SUFFIX + fileName;
+//
+//                                        File f = new File(fileName);
+//                                        file.transferTo(f);
+//
+//                                        s3client.putObject(new PutObjectRequest(bucketName, folderToPut, f));
+
+
+                                        String buc=System.getProperty("bucket.name");
+                                        createFolder(buc, file);
                                         //  String fileName = folderName + SUFFIX + "testvideo.mp4";
-                                        s3client.putObject(new PutObjectRequest(bucketName, fileName,
-                                                new File(fileName)));
+                                        // s3client.putObject(new PutObjectRequest(bucketName, fileName, new File(fileName)));
+
+                                        // AmazonS3 s3client = s3Client.getS3Client();
+
+                                        //     List<Bucket> buckets = s3client.listBuckets();
+
+                                        //String bucketName = "code-deploy.csye6225-fall2017-patelshu.me";
+
+                                        // String folderName = "FileFolder";
+                                        //createFolder(bucketName, folderName, s3client);
+
+                                        // String folderToPut = folderName + SUFFIX + fileName;
+
+                                        //File f = new File(fileName);
+                                        //file.transferTo(f);
+
+                                        //s3client.putObject(new PutObjectRequest(bucketName, folderToPut, f));
+
+
 
 
                                         TaskAttachments ta = new TaskAttachments();
-
-                                        ta.setPath(path.toString());
+ta.setPath("https://s3.amazonaws.com/"+buc+"/"+fileName);
+                                      //  ta.setPath(path.toString());
                                         ta.setId(generateUUID.getUUID());
                                         ta.setTodoTask(todoTask);
 
@@ -476,23 +578,31 @@ public class UserController {
                                         flag = true;
                                         System.out.println("You successfully uploaded file");
                                         response.setStatus(200);
-                                        return "Saved";
+                                        JsonObject j = new JsonObject();
+                                        j.addProperty("Information", "Saved");
+                                        return j.toString();
 
 
-                                    } //else
-                                        //return "ID does not exists";
+                                    }
                                 }
-                                if (!flag){
-                                    return "ID does not exists";
+                                if (!flag) {
+                                    JsonObject j = new JsonObject();
+                                    j.addProperty("Error", "ID does not exists");
+                                    return j.toString();
+
+
                                 }
 
 
                             } catch (Exception e) {
-                                System.out.println(e.getMessage());
+                                System.out.println(e);
                                 response.setStatus(400);
-                                return "Bad Request";
+                                JsonObject j = new JsonObject();
+                                j.addProperty("Error", "Bad Request");
+                                return j.toString();
+
                             }
-                        }else {
+                        } else {
 
                             JsonObject j = new JsonObject();
                             j.addProperty("Error", "Password Doesn't Match");
@@ -500,19 +610,20 @@ public class UserController {
                         }
 
                     }
-                }while (itr.hasNext());
+                } while (itr.hasNext());
 
                 JsonObject j = new JsonObject();
                 j.addProperty("Error", "User With Given Email " + email + " Doest Exist!!!");
-
                 return j.toString();
+
             } else {
 
                 JsonObject j = new JsonObject();
                 j.addProperty("Error", "Unauthorized User: You Are Not Logged In");
                 return j.toString();
             }
-        }else {
+
+        } else {
             System.out.println("You failed to upload  because the file was empty.");
 
             JsonObject j = new JsonObject();
@@ -525,13 +636,9 @@ public class UserController {
     }
 
 
-
-
-
-
-
     @RequestMapping(value = "/tasks/{id}/attachments/{idAttachments}", method = RequestMethod.DELETE)
-    public String deleteAttachment(@PathVariable("idAttachments") String idAttachments, HttpServletRequest request, HttpServletResponse response) {
+    public String deleteAttachment(@PathVariable("id") String todotaskid, @PathVariable("idAttachments") String idAttachments, HttpServletRequest request, HttpServletResponse response) {
+
 
         final String authorization = request.getHeader("Authorization");
         if (authorization != null && authorization.startsWith("Basic")) {
@@ -561,33 +668,46 @@ public class UserController {
                     if (BCrypt.checkpw(password, u1.getPassword())) {
 
                         try {
-                            String taskId = idAttachments;
 
-                            Iterable<TaskAttachments> attachments = attachmentsDao.findAll();
+                            String attachmentId = idAttachments;
 
-                            Iterator itr = attachments.iterator();
+                            Iterable<TodoTask> tasks = taskDao.findAll();
 
-                            while (itr.hasNext()) {
+                            Iterator itr2 = tasks.iterator();
 
-                                TaskAttachments taskAttachments = (TaskAttachments) itr.next();
+                            while (itr2.hasNext()) {
 
-                                if (taskAttachments.getId().equalsIgnoreCase(taskId)) {
-
-                                  //  s3client.deleteObject(bucketName, fileName);
-
-                                    attachmentsDao.delete(taskAttachments);
-
-                                    response.setStatus(204);
-
-                                    JsonObject j = new JsonObject();
-                                    j.addProperty("Information", "Attachment with  Id: " + taskId + " has been deleted");
-                                    return j.toString();
+                                TodoTask todoTask = (TodoTask) itr2.next();
 
 
+                                //  s3client.deleteObject(bucketName, fileName);
 
-                                }
+
+                                boolean flag1 = false;
+                                TaskAttachments tobedeletd = null;
+
+                                if (todoTask.getId().equalsIgnoreCase(todotaskid) && todoTask.getUsers() == u1) {
+                                    List<TaskAttachments> attachlist = new ArrayList<TaskAttachments>();
+                                    for (TaskAttachments att : attachlist) {
+                                        if (att.getId().equalsIgnoreCase(attachmentId)) {
+
+                                            flag1 = true;
+                                            tobedeletd = att;
+                                        }
+                                    }
+                                    if (flag1) {
+                                        attachmentsDao.delete(tobedeletd);
+                                    }
+
+                                    System.out.println("You successfully deleted file");
+                                    response.setStatus(200);
+                                    return "deleted";
+
+
+                                } //else
+                                //return "ID does not exists";
+
                             }
-
 
 
                             response.setStatus(400);
@@ -597,14 +717,15 @@ public class UserController {
                             return j.toString();
 
 
-
-
                         } catch (Exception e) {
                             System.out.println(e.getMessage());
                             response.setStatus(400);
-                            return "Bad Request";
+                            JsonObject j = new JsonObject();
+                            j.addProperty("Error", "Bad Request");
+                            return j.toString();
+
                         }
-                    }else {
+                    } else {
 
                         JsonObject j = new JsonObject();
                         j.addProperty("Error", "Password Doesn't Match");
@@ -612,7 +733,7 @@ public class UserController {
                     }
 
                 }
-            }while (itr1.hasNext());
+            } while (itr1.hasNext());
 
             JsonObject j = new JsonObject();
             j.addProperty("Error", "User With Given Email " + email + " Doest Exist!!!");
@@ -627,10 +748,6 @@ public class UserController {
 
 
     }
-
-
-
-
 
 
     @RequestMapping(value = "/tasks/{id}/attachments", method = RequestMethod.GET)
@@ -676,32 +793,33 @@ public class UserController {
 
                                 TodoTask todoTask = (TodoTask) itr.next();
 
-                                if (todoTask.getId().equalsIgnoreCase(taskId)) {
+                                if (todoTask.getId().equalsIgnoreCase(taskId) && todoTask.getUsers() == u1) {
 
                                     List<TaskAttachments> tal;
 
-                                    tal=todoTask.getTaskAttachments();
+                                    tal = todoTask.getTaskAttachments();
 
-                                   JsonArray ja = new JsonArray();
+                                    JSONArray ja = new JSONArray();
+                                    //JsonArray ja = new JsonArray();
 
-                                    for(TaskAttachments ta : tal){
+
+                                    for (TaskAttachments ta : tal) {
 
                                         JsonObject jo = new JsonObject();
-                                        jo.addProperty("Attachment",ta.toString());
+                                        jo.addProperty("AttachmentID", ta.getId());
+                                        jo.addProperty("Path", ta.getPath());
+                                        ja.add(jo);
 
-                                    ja.add(jo);
 
                                     }
 
 
-
                                     response.setStatus(200);
 
-                                    return ja ;
+                                    return ja.toString();
 
                                 }
                             }
-
 
 
                             response.setStatus(401);
@@ -711,11 +829,7 @@ public class UserController {
                             return j.toString();
 
 
-
-
-
-
-                    } catch (Exception e) {
+                        } catch (Exception e) {
                             System.out.println(e.getMessage());
                             response.setStatus(400);
                             return "Bad Request";
@@ -744,6 +858,7 @@ public class UserController {
 
     }
 }
+
 
 
 

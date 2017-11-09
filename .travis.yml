@@ -8,7 +8,7 @@ install: true
 script:
   - ./gradlew build
   - mkdir codedeploy
-  - zip -r csye6225-${TRAVIS_JOB_NUMBER}.zip build/libs/ROOT.war appspec.yml restartTomcat.sh
+  - zip -r csye6225-${TRAVIS_JOB_NUMBER}.zip build/libs/ROOT.war appspec.yml restart.sh
   - ls -al
   - mv csye6225-${TRAVIS_JOB_NUMBER}.zip codedeploy/
   - ls -al
@@ -29,7 +29,8 @@ deploy:
    bucket: csye6225-fall2017-sawantap.me.csye6225.com
    region: us-east-1
    skip_cleanup: true
-   all_branches: true
+   on :
+    all_branches: true
  - provider: codedeploy
    access_key_id: $ACCESS_ID
    bucket: csye6225-fall2017-sawantap.me.csye6225.com
@@ -40,6 +41,8 @@ deploy:
    region: us-east-1
    secret_access_key: $ACCESS_KEY
    wait-until-deployed: true
+   on :
+    all_branches: true
 
 notifications:
   email:
@@ -47,4 +50,3 @@ notifications:
     - patel.shu@husky.neu.edu
     - sawant.ap@husky.neu.edu
     - chabhadia.r@husky.neu.edu
-
