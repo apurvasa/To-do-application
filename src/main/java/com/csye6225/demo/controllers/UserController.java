@@ -406,21 +406,40 @@ public class UserController {
     @ResponseBody
     public String reset(@RequestBody JSONObject jo) {
 
+
+boolean flag=false;
+
         System.out.println(jo.toString());
         String userName = jo.get("Username").toString();
-//http://example.com/reset?email=user@somedomain.com&token=4e163b8b-889a-4ce7-a3f7-61041e323c23
-        //publish to an SNS topic
-        //create a new SNS client and set endpoint
         AmazonSNSClient snsClient = new AmazonSNSClient(new DefaultAWSCredentialsProviderChain());
-        // AmazonSNSClient snsClient = AmazonSNSClientBuilder.standard().withCredentials(new InstanceProfileCredentialsProvider(false)).build();
+        String top=snsClient.createTopic("csye6225-Topic").getTopicArn();
         snsClient.setRegion(Region.getRegion(Regions.US_EAST_1));
 
-        String topicArn = "arn:aws:sns:us-east-1:522609256606:testdem0";
+        String topicArn = top;
+
+        Iterable<User> lu = userDao.findAll();
+        Iterator itr = lu.iterator();
+
+        do {
+
+            User u1 = (User) itr.next();
+
+            if (u1.getEmail().equalsIgnoreCase(userName)) {
+                flag=true;
+                               return  "Email sent";
+            }
+        }
+        while (itr.hasNext());
+
+if(flag==false){
         PublishRequest publishRequest = new PublishRequest(topicArn, userName);
         PublishResult publishResult = snsClient.publish(publishRequest);
-//print MessageId of message published to SNS topic
-        System.out.println("MessageId - " + publishResult.getMessageId());
-        return publishResult.getMessageId();
+        System.out.println("MessageId - " + publishResult.getMessageId());}
+        response.setStatus(200);
+        JsonObject j = new JsonObject();
+        j.addProperty("Information", "Reset Link Sent");
+        return j.toString();
+
     }
 
 
