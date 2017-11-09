@@ -438,7 +438,11 @@
 				"ProvisionedThroughput": {
 					"ReadCapacityUnits": "5",
 					"WriteCapacityUnits": "5"
-				}
+				},
+				"TimeToLiveSpecification": {
+    "AttributeName": "TimeToLive",
+    "Enabled": "TRUE"
+  }
 			}
 		},
 		"S3Bucket": {
