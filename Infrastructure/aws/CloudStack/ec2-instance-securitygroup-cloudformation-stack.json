@@ -80,12 +80,12 @@
 		"TravisCodeDep":{
 			"Type":"String"
 		},
-		"LamdaSnsRole":{
-			"Type":"String"
-		},
-		"SnsTopic":{
-			"Type":"String"
-		}
+        "LamdaSnsRole":{
+           "Type":"String" 
+        },
+"SnsTopic":{
+ "Type":"String" 
+}
 	},
 	"Resources":{
 		"EC2Instance":{
@@ -107,43 +107,43 @@
 						]
 					}
 				],
-				"UserData": { "Fn::Base64" : { "Fn::Join" : ["", [
-					"#!/bin/bash\n",
-					"sudo apt-get update\n",
-					"sudo apt-get install openjdk-8-jdk -y\n",
-					"sudo apt-get install tomcat8 -y\n",
-					"sudo service tomcat8 start\n",
-					"sudo apt-get update\n",
-					"sudo apt-get install ruby -y\n",
-					"sudo apt-get install wget\n",
-					"cd /home/ubuntu\n",
-					"wget https://aws-codedeploy-us-east-1.s3.amazonaws.com/latest/install\n",
-					"chmod +x ./install\n",
-					"sudo ./install auto\n",
-					"sudo service codedeploy-agent start\n",
-					"sudo service codedeploy-agent status\n",
-					"echo '#!/bin/sh' >> /usr/share/tomcat8/bin/setenv.sh \n",
-					{
-						"Fn::Sub": "echo 'JAVA_OPTS=\"$JAVA_OPTS -Dspring.datasource.url=jdbc:mysql://${RDSInstance.Endpoint.Address}:3306/csye6225\"' >> /usr/share/tomcat8/bin/setenv.sh\n"
-					},
-					{
-						"Fn::Sub": "echo 'JAVA_OPTS=\"$JAVA_OPTS -Dspring.datasource.username=${DBUser}\"' >> /usr/share/tomcat8/bin/setenv.sh\n"
-					},
-					{
-						"Fn::Sub": "echo 'JAVA_OPTS=\"$JAVA_OPTS -Dspring.datasource.password=${DBPassword}\"' >> /usr/share/tomcat8/bin/setenv.sh\n"
-					},
-					{
-						"Fn::Sub": "echo 'JAVA_OPTS=\"$JAVA_OPTS -Dbucket.name=${S3BucketName}\"' >> /usr/share/tomcat8/bin/setenv.sh\n"
-					},
-					"chmod +x /usr/share/tomcat8/bin/setenv.sh\n",
-					"chown tomcat8:tomcat8 /usr/share/tomcat8/bin/setenv.sh\n",
-					"chmod 777 -R /tmp\n",
-					"chmod 777 /var/lib/tomcat8\n",
-					"chmod 777 /var/lib/tomcat8/webapps"
-				]
-				]
-				}
-				},
+			"UserData": { "Fn::Base64" : { "Fn::Join" : ["", [
+	          "#!/bin/bash\n",
+	          "sudo apt-get update\n",
+	          "sudo apt-get install openjdk-8-jdk -y\n",
+	          "sudo apt-get install tomcat8 -y\n",
+	          "sudo service tomcat8 start\n",        
+	          "sudo apt-get update\n",
+	          "sudo apt-get install ruby -y\n",
+	          "sudo apt-get install wget\n",
+	          "cd /home/ubuntu\n",
+	          "wget https://aws-codedeploy-us-east-1.s3.amazonaws.com/latest/install\n",
+	          "chmod +x ./install\n",
+	          "sudo ./install auto\n",
+	          "sudo service codedeploy-agent start\n",
+	          "sudo service codedeploy-agent status\n",
+	          "echo '#!/bin/sh' >> /usr/share/tomcat8/bin/setenv.sh \n",
+	          {
+	            "Fn::Sub": "echo 'JAVA_OPTS=\"$JAVA_OPTS -Dspring.datasource.url=jdbc:mysql://${RDSInstance.Endpoint.Address}:3306/csye6225\"' >> /usr/share/tomcat8/bin/setenv.sh\n"
+	          },
+	          {
+	            "Fn::Sub": "echo 'JAVA_OPTS=\"$JAVA_OPTS -Dspring.datasource.username=${DBUser}\"' >> /usr/share/tomcat8/bin/setenv.sh\n"
+	          },
+	          {
+	            "Fn::Sub": "echo 'JAVA_OPTS=\"$JAVA_OPTS -Dspring.datasource.password=${DBPassword}\"' >> /usr/share/tomcat8/bin/setenv.sh\n"
+	          },
+	          {
+	            "Fn::Sub": "echo 'JAVA_OPTS=\"$JAVA_OPTS -Dbucket.name=${S3BucketName}\"' >> /usr/share/tomcat8/bin/setenv.sh\n"
+	          },
+	          "chmod +x /usr/share/tomcat8/bin/setenv.sh\n",
+	          "chown tomcat8:tomcat8 /usr/share/tomcat8/bin/setenv.sh\n",
+	          "chmod 777 -R /tmp\n",
+	          "chmod 777 /var/lib/tomcat8\n",
+	          "chmod 777 /var/lib/tomcat8/webapps"
+	            ]
+	          ]
+	         }
+	        },
 				"KeyName":{
 					"Ref":"KeyName"
 				},
@@ -195,7 +195,7 @@
 						"ToPort":"443",
 						"CidrIp":"0.0.0.0/0"
 					},
-					{
+{
 						"IpProtocol":"tcp",
 						"FromPort":"3306",
 						"ToPort":"3306",
@@ -326,7 +326,7 @@
 				"RoleName": {"Ref" :"CodeDepRole"}
 			}
 		},
-		"LamdaSNSRole":{
+        	"LamdaSNSRole":{
 			"Type": "AWS::IAM::Role",
 			"Properties": {
 				"AssumeRolePolicyDocument": {
@@ -366,7 +366,7 @@
 					"Ref": "EngineVersion"
 				},
 				"MultiAZ": "false",
-				"PubliclyAccessible" : "true",
+ 				"PubliclyAccessible" : "true",
 				"DBInstanceIdentifier": {
 					"Ref": "DBInstanceIdentifier"
 				},
@@ -422,12 +422,6 @@
 						"Ref": "PrimaryKeyName"
 					},
 					"AttributeType": "S"
-				},{
-					"AttributeName" : "userName",
-					"AttributeType" : "S"
-				},{
-					"AttributeName" : "token",
-					"AttributeType" : "S"
 				}],
 				"KeySchema": [{
 					"AttributeName": {
@@ -439,6 +433,7 @@
 					"ReadCapacityUnits": "5",
 					"WriteCapacityUnits": "5"
 				},
+  "TimeToLiveSpecification": {
 				"TimeToLiveSpecification": {
     "AttributeName": "TimeToLive",
     "Enabled": "TRUE"
@@ -474,12 +469,13 @@
 			}
 		},
 
-		"MySNSTopic" : {
-			"Type" : "AWS::SNS::Topic",
-			"Properties" : {
-				"TopicName" : {"Ref":"SnsTopic"}
-			}
-		}
+"MySNSTopic" : {
+   "Type" : "AWS::SNS::Topic",
+   "Properties" : {
+      "TopicName" : {"Ref":"SnsTopic"}
+   }
+}
 	}
 }
+
 
