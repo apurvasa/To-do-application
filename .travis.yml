@@ -36,18 +36,10 @@ deploy:
    on :
     all_branches: true
  - provider: codedeploy
-<<<<<<< HEAD
    access_key_id: $access_key_id
    secret_access_key: $secret_access_key
    bucket: $bucket
    key: csye6225.zip
-=======
-   access_key_id: AKIAILJNNSYHRZPOQLNA
-   secret_access_key:
-    secure: eoEFbTSt4WAnvMTcehrLk1m6adXXrRydgy3T9YxVCYRqDJX4lOCm17sPXc0uPxsaFL7UxOvTUz2i2kqKP1D6IluHoeVei5RIK0dOk4DLNC+rpjcnrjjNfnVWi2wZfvRgP160N5d8vVz1f8rGBDZ86/OZkxTqWGGdhsGZIE27bRkeaD71yr9hZQFCvS272X5sxbkGtnoCth8BEC3VZNVxfacgLEhmuBToEMFFzlUxNOjkfvstZOXSDPGu5OKMtjDP776p0YjW26fYtXMxm2yOGkT/LKJ31pxkXx68YgjrP63t94B8DXMc/agCU8q0FVY779NZJIaibyEdCCQEDB/zO08Qfn+gWjRIpyfkFk9N087CFpXZ2YdupvfGAYKLGh4MfcVvcWQUBg/kbyU2u6ihMZifXV8EW7DAKig3yHvf39SHiLWfb4YnUEBheCZKE3kbM1QnvFC28spEdEsg83wk27ZV1HUYSIVylzSubj+SoRZXIp4wRsPwuhO7qxloPcbzO4u+77UE5pknqYy1hEBTkHRz5kfWJAmq+VkvnzGdbkvJ7phsZliwvAMQLfuZ91jEiUW7wOURcPie/xAKszMN3iY0HzdPj47Mrf0Hq1E/hMMFP1elByqYNBMeXSI6HAsyitU3DW9z8VI86WsmRIDUtb6CsjyFgkBRH0rIDc3sNY0=
-   bucket: code-deploy.csye6225-fall2017-chabhadiar.me
-   key: TestJavaProject-${TRAVIS_JOB_NUMBER}.zip
->>>>>>> acab167d1dc13a31c066e9ef3b7b984e3562ea35
    bundle_type: zip
    application: SimpleTestJAVA
    deployment_group: CSYE6225
