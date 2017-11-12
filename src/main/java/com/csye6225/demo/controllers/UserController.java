@@ -1,11 +1,21 @@
 package com.csye6225.demo.controllers;
 
 
-import com.amazonaws.auth.InstanceProfileCredentialsProvider;
+import com.amazonaws.auth.*;
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
+import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClientBuilder;
+import com.amazonaws.services.simpleemail.model.*;
+import com.amazonaws.services.sns.AmazonSNSAsyncClientBuilder;
+import com.amazonaws.services.sns.AmazonSNSClient;
+import com.amazonaws.services.sns.AmazonSNSClientBuilder;
+import com.amazonaws.services.sns.model.PublishRequest;
+import com.amazonaws.services.sns.model.PublishResult;
 import com.csye6225.demo.bean.TaskAttachments;
 import com.csye6225.demo.bean.TodoTask;
 import com.csye6225.demo.bean.User;
@@ -33,8 +43,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.charset.Charset;
 import java.util.*;
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.BasicAWSCredentials;
+
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -700,12 +709,31 @@ public class UserController {
 
     }
 
+    @RequestMapping(value = "/forgot-password", method = RequestMethod.POST)
+    @ResponseBody
+    public String reset(@RequestBody JSONObject jo) {
+
+        System.out.println(jo.toString());
+        String userName = jo.get("Username").toString();
+//http://example.com/reset?email=user@somedomain.com&token=4e163b8b-889a-4ce7-a3f7-61041e323c23
+        //publish to an SNS topic
+        //create a new SNS client and set endpoint
+        AmazonSNSClient snsClient = new AmazonSNSClient(new DefaultAWSCredentialsProviderChain());
+        // AmazonSNSClient snsClient = AmazonSNSClientBuilder.standard().withCredentials(new InstanceProfileCredentialsProvider(false)).build();
+        snsClient.setRegion(Region.getRegion(Regions.US_EAST_1));
+
+        String topicArn = "arn:aws:sns:us-east-1:356292947987:csye6225-Topic";
+        PublishRequest publishRequest = new PublishRequest(topicArn, userName);
+        PublishResult publishResult = snsClient.publish(publishRequest);
+//print MessageId of message published to SNS topic
+        System.out.println("MessageId - " + publishResult.getMessageId());
+        return publishResult.getMessageId();
+    }
 
 
 
 
-
-    @RequestMapping(value = "/tasks/{id}/attachments", method = RequestMethod.GET)
+        @RequestMapping(value = "/tasks/{id}/attachments", method = RequestMethod.GET)
     public Object getAttachment(@PathVariable("id") String id, HttpServletRequest request, HttpServletResponse response) {
 
 
@@ -818,5 +846,62 @@ public class UserController {
 
 
     }
+
+
+    public static void sendemail () {
+         final String FROM = "sender@example.com";
+
+        // Replace recipient@example.com with a "To" address. If your account
+        // is still in the sandbox, this address must be verified.
+         final String TO = "recipient@example.com";
+
+        // The configuration set to use for this email. If you do not want to use a
+        // configuration set, comment the following variable and the
+        // .withConfigurationSetName(CONFIGSET); argument below.
+         final String CONFIGSET = "ConfigSet";
+
+         String link = "";
+        // The subject line for the email.
+         final String SUBJECT = "Password reset link";
+
+        // The HTML body for the email.
+         final String HTMLBODY = "<h1>rest link</h1>"
+                + "<p>This email was sent with <a href='https://aws.amazon.com/ses/'>"
+                + "Amazon SES</a> using the <a href='https://aws.amazon.com/sdk-for-java/'>"
+                + "AWS SDK for Java</a>";
+
+        // The email body for recipients with non-HTML email clients.
+         final String TEXTBODY = link;
+
+
+        try {
+            AmazonSimpleEmailService client =
+                    AmazonSimpleEmailServiceClientBuilder.standard()
+                            // Replace US_WEST_2 with the AWS Region you're using for
+                            // Amazon SES.
+                            .withRegion(Regions.US_EAST_1).build();
+            SendEmailRequest request = new SendEmailRequest()
+                    .withDestination(
+                            new Destination().withToAddresses(TO))
+                    .withMessage(new Message()
+                            .withBody(new Body()
+                                    .withHtml(new Content()
+                                            .withCharset("UTF-8").withData(HTMLBODY))
+                                    .withText(new Content()
+                                            .withCharset("UTF-8").withData(TEXTBODY)))
+                            .withSubject(new Content()
+                                    .withCharset("UTF-8").withData(SUBJECT)))
+                    .withSource(FROM)
+                    // Comment or remove the next line if you are not using a
+                    // configuration set
+                    .withConfigurationSetName(CONFIGSET);
+            client.sendEmail(request);
+            System.out.println("Email sent!");
+        } catch (Exception ex) {
+            System.out.println("The email was not sent. Error message: "
+                    + ex.getMessage());
+        }
+    }
 }
+//}
 
