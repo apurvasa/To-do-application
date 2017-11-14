@@ -426,12 +426,12 @@ public class UserController {
 
             if (u1.getEmail().equalsIgnoreCase(userName)) {
                 flag=true;
-                return  "Email sent";
+              //  return  "Email sent";
             }
         }
         while (itr.hasNext());
 
-        if(flag==false){
+        if(flag==true){
             PublishRequest publishRequest = new PublishRequest(topicArn, userName);
             PublishResult publishResult = snsClient.publish(publishRequest);
             System.out.println("MessageId - " + publishResult.getMessageId());}
