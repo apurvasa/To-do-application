@@ -19,7 +19,6 @@ import com.csye6225.demo.dao.TaskDao;
 import com.csye6225.demo.dao.UserDao;
 import com.csye6225.demo.services.GenerateUUID;
 import com.google.gson.*;
-import javax.servlet.http.HttpServletRequest;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,7 +67,7 @@ public class UserController {
 
 
 
-            AmazonS3 s3client= AmazonS3ClientBuilder.standard().withCredentials(new InstanceProfileCredentialsProvider(false)).build();
+    AmazonS3 s3client= AmazonS3ClientBuilder.standard().withCredentials(new InstanceProfileCredentialsProvider(false)).build();
 
     String bucketName = "code-deploy.csye6225-fall2017-chabhadiar.me.com";
 
@@ -407,21 +406,40 @@ public class UserController {
     @ResponseBody
     public String reset(@RequestBody JSONObject jo) {
 
+
+        boolean flag=false;
+
         System.out.println(jo.toString());
         String userName = jo.get("Username").toString();
-//http://example.com/reset?email=user@somedomain.com&token=4e163b8b-889a-4ce7-a3f7-61041e323c23
-        //publish to an SNS topic
-        //create a new SNS client and set endpoint
         AmazonSNSClient snsClient = new AmazonSNSClient(new DefaultAWSCredentialsProviderChain());
-        // AmazonSNSClient snsClient = AmazonSNSClientBuilder.standard().withCredentials(new InstanceProfileCredentialsProvider(false)).build();
+        String top=snsClient.createTopic("csye6225-Topic").getTopicArn();
         snsClient.setRegion(Region.getRegion(Regions.US_EAST_1));
 
-        String topicArn = "arn:aws:sns:us-east-1:522609256606:testdem0";
-        PublishRequest publishRequest = new PublishRequest(topicArn, userName);
-        PublishResult publishResult = snsClient.publish(publishRequest);
-//print MessageId of message published to SNS topic
-        System.out.println("MessageId - " + publishResult.getMessageId());
-        return publishResult.getMessageId();
+        String topicArn = top;
+
+        Iterable<User> lu = userDao.findAll();
+        Iterator itr = lu.iterator();
+
+        do {
+
+            User u1 = (User) itr.next();
+
+            if (u1.getEmail().equalsIgnoreCase(userName)) {
+                flag=true;
+                return  "Email sent";
+            }
+        }
+        while (itr.hasNext());
+
+        if(flag==false){
+            PublishRequest publishRequest = new PublishRequest(topicArn, userName);
+            PublishResult publishResult = snsClient.publish(publishRequest);
+            System.out.println("MessageId - " + publishResult.getMessageId());}
+        response.setStatus(200);
+        JsonObject j = new JsonObject();
+        j.addProperty("Information", "Reset Link Sent");
+        return j.toString();
+
     }
 
 
@@ -565,8 +583,8 @@ public class UserController {
 
 
                                         TaskAttachments ta = new TaskAttachments();
-ta.setPath("https://s3.amazonaws.com/"+buc+"/"+fileName);
-                                      //  ta.setPath(path.toString());
+                                        ta.setPath("https://s3.amazonaws.com/"+buc+"/"+fileName);
+                                        //  ta.setPath(path.toString());
                                         ta.setId(generateUUID.getUUID());
                                         ta.setTodoTask(todoTask);
 
@@ -858,8 +876,5 @@ ta.setPath("https://s3.amazonaws.com/"+buc+"/"+fileName);
 
     }
 }
-
-
-
 
 
