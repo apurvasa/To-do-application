@@ -9,7 +9,7 @@ os: linux
 files:
   - source: ./appspec.yml
     destination: /home/ubuntu
-  - source: ./restartTomcat.sh
+  - source: ./restart.sh
     destination: /home/ubuntu
   - source: ./build/libs/ROOT.war
     destination: /var/lib/tomcat8/webapps
