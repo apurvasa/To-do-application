@@ -404,7 +404,7 @@ public class UserController {
 
     @RequestMapping(value = "/forgot-password", method = RequestMethod.POST)
     @ResponseBody
-    public String reset(@RequestBody JSONObject jo) {
+    public String reset(@RequestBody JSONObject jo, HttpServletResponse response) {
 
 
         boolean flag=false;
