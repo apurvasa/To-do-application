@@ -11,7 +11,7 @@ script:
 
 after_success:
  - mkdir codedeploy
- - zip -r csye6225.zip build/libs/ROOT.war appspec.yml restart.sh
+ - zip -r csye6225.zip build/libs/ROOT.war appspec.yml restart.sh Infrastructure/aws/cloudwatch/awslogs.conf restartCloudWatch.sh
  - ls -al
  - mv csye6225.zip codedeploy/
  - ls -al
