@@ -19,7 +19,7 @@ files:
 
 hooks:
   AfterInstall:
-  - location: ./restartTomcat.sh
+  - location: ./restart.sh
     timeout: 180
     runas: ubuntu
   - location: ./restartCloudWatch.sh
