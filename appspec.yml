@@ -1,0 +1,18 @@
+version: 0.0
+
+os: linux
+
+
+
+
+files:
+  - source: ./appspec.yml
+    destination: /home/ubuntu
+  - source: ./Infrastructure/aws/cloudwatch/awslogs.conf
+    destination: /var/awslogs/etc/awslogs.conf
+  - source: ./restart.sh
+    destination: /home/ubuntu
+  - source: ./restartCloudWatch.sh
+    destination: /home/ubuntu
+  - source: ./build/libs/ROOT.war
+    destination: /var/lib/tomcat8/webapps
