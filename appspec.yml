@@ -9,7 +9,7 @@ files:
   - source: ./appspec.yml
     destination: /home/ubuntu
   - source: ./Infrastructure/aws/cloudwatch/awslogs.conf
-    destination: /var/awslogs/etc/awslogs.conf
+    destination: /var/awslogs/etc
   - source: ./restart.sh
     destination: /home/ubuntu
   - source: ./restartCloudWatch.sh
