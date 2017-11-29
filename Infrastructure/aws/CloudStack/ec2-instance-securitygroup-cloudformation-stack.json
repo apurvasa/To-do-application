@@ -148,7 +148,8 @@
 					"sudo apt-get install python -y\n",
 					"wget https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py\n",
 					"echo ' ' >> /home/ubuntu/awslog.conf \n",
-					"python awslogs-agent-setup.py -n -r ", { "Ref" : "AWS::Region" }, " -c /home/ubuntu/awslog.conf || error_exit 'Failed to run CloudWatch Logs agent setup' "
+					"python awslogs-agent-setup.py -n -r ", { "Ref" : "AWS::Region" }, " -c /home/ubuntu/awslog.conf || error_exit 'Failed to run CloudWatch Logs agent setup' ",
+                                         "sudo rm /home/ubuntu/awslog.conf"
 				]
 				]
 				}
@@ -301,7 +302,7 @@
 								"codedeploy:GetApplicationRevision"
 							],
 							"Resource": [
-								"arn:aws:codedeploy:us-east-1:522609256606:application:SimpleTestJAVA"
+								"arn:aws:codedeploy:us-east-1:356292947987:application:csye6225"
 							]
 						},
 						{
@@ -320,9 +321,9 @@
 								"codedeploy:GetDeploymentConfig"
 							],
 							"Resource": [
-								"arn:aws:codedeploy:us-east-1:522609256606:deploymentconfig:CodeDeployDefault.OneAtATime",
-								"arn:aws:codedeploy:us-east-1:522609256606:deploymentconfig:CodeDeployDefault.HalfAtATime",
-								"arn:aws:codedeploy:us-east-1:522609256606:deploymentconfig:CodeDeployDefault.AllAtOnce"
+								"arn:aws:codedeploy:us-east-1:356292947987:deploymentconfig:CodeDeployDefault.OneAtATime",
+								"arn:aws:codedeploy:us-east-1:356292947987:deploymentconfig:CodeDeployDefault.HalfAtATime",
+								"arn:aws:codedeploy:us-east-1:356292947987:deploymentconfig:CodeDeployDefault.AllAtOnce"
 							]
 						}
 					]
