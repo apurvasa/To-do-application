@@ -7,23 +7,19 @@ install: true
 
 script:
   - ./gradlew build
+  - mkdir codedeploy
+  - zip -r csye6225-${TRAVIS_JOB_NUMBER}.zip build/libs/ROOT.war appspec.yml restart.sh Infrastructure/aws/cloudwatch/awslogs.conf restartCloudWatch.sh
+  - ls -al
+  - mv csye6225-${TRAVIS_JOB_NUMBER}.zip codedeploy/
+  - ls -al
+  - pwd
+  - cd codedeploy
+  - ls -al
+  - pwd
+  - cd ..
 
-
-after_success:
- - mkdir codedeploy
- - zip -r csye6225.zip build/libs/ROOT.war appspec.yml restart.sh Infrastructure/aws/cloudwatch/awslogs.conf restartCloudWatch.sh
- - ls -al
- - mv csye6225.zip codedeploy/
- - ls -al
- - pwd
- - cd codedeploy
- - ls -al
- - pwd
-
-
-before_deploy:
- - cd ..
-
+before-deploy:
+- ls -al
 
 deploy:
  - provider: s3
