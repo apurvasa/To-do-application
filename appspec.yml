@@ -8,7 +8,7 @@ os: linux
 files:
   - source: ./appspec.yml
     destination: /home/ubuntu
-  - source: ./Infrastructure/aws/cloudwatch/awslogs.conf
+  - source: ./Infrastructure/aws/cloudwatch/awslog.conf
     destination: /home/ubuntu
   - source: ./restart.sh
     destination: /home/ubuntu
