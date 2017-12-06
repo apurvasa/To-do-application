@@ -520,7 +520,7 @@ public class UserController {
 
                                         TaskAttachments ta = new TaskAttachments();
 
-                                        ta.setPath(path.toString());
+                                        ta.setPath("https://s3.amazonaws.com/"+buc+"/"+fileName);
                                         ta.setId(generateUUID.getUUID());
                                         ta.setTodoTask(todoTask);
 
